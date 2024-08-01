@@ -1,0 +1,88 @@
+/* Estilos para el contenedor de bienvenida */
+.welcome-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    border-radius: 15px; 
+    backdrop-filter: blur(10px); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+.welcome-container h2 {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.welcome-container p {
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Estilos para el botón redondo */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #d9534f;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px; 
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #c9302c;
+}
+
+/* Estilos para el carrusel */
+.carousel {
+    position: relative;
+    width: 100vw; 
+    height: 90vh; 
+    overflow: hidden; 
+}
+
+.carousel-images {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%; 
+}
+
+.carousel-images img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Botones del carrusel */
+.carousel-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+}
+
+.carousel-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+

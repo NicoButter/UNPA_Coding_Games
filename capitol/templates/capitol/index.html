@@ -1,0 +1,56 @@
+{% extends 'capitol/base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div class="carousel">
+        <div class="carousel-images">
+            <img src="{% static 'capitol/images/code_camp_1.jpg' %}" alt="Slide 1">
+            <img src="{% static 'capitol/images/code_camp_4.jpg' %}" alt="Slide 2">
+            <img src="{% static 'capitol/images/code_camp_3.jpg' %}" alt="Slide 3">
+            <img src="{% static 'capitol/images/capitol_maker.jpg' %}" alt="Slide 3">
+
+            <!-- Agrega más imágenes según sea necesario -->
+        </div>
+        <button class="carousel-button prev" onclick="moveSlide(-1)">&#10094;</button>
+        <button class="carousel-button next" onclick="moveSlide(1)">&#10095;</button>
+    </div>
+
+    <div class="welcome-container">
+        <h2>Bienvenido a The Coding Games</h2>
+        <p>¡Prepárate para demostrar tus habilidades en nuestra competencia anual de programación!</p>
+        <p>Elige tus desafíos y compite con tus compañeros para convertirte en el mejor programador.</p>
+        <a href="{% url 'login' %}" class="btn">Entrar en la Arena</a>
+    </div>
+{% endblock %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'capitol/css/index_styles.css' %}">   
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let index = 0;
+    const slides = document.querySelectorAll('.carousel-images img');
+    const totalSlides = slides.length;
+
+    function moveSlide() {
+        index = (index + 1) % totalSlides;
+        const offset = -index * 100;
+        document.querySelector('.carousel-images').style.transform = `translateX(${offset}%)`;
+    }
+
+    // Mueve el carrusel cada 3 segundos
+    setInterval(moveSlide, 3000); // Ajusta el tiempo según sea necesario
+
+    // Opcional: Agrega funcionalidad a los botones
+    document.querySelector('.prev').addEventListener('click', () => {
+        index = (index - 1 + totalSlides) % totalSlides;
+        const offset = -index * 100;
+        document.querySelector('.carousel-images').style.transform = `translateX(${offset}%)`;
+    });
+
+    document.querySelector('.next').addEventListener('click', () => moveSlide());
+</script>
+</script>
+{% endblock %}
