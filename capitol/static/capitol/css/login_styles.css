@@ -1,0 +1,93 @@
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Estilos para los encabezados */
+.login-container h2 {
+    margin-bottom: 20px;
+}
+
+/* Estilos para los campos del formulario */
+.login-container form {
+    display: flex;
+    flex-direction: column; 
+}
+
+.login-container form p {
+    margin-bottom: 15px; 
+}
+
+.login-container input {
+    padding: 10px;
+    margin-bottom: 10px; 
+    border: 1px solid #ddd; 
+    border-radius: 4px; 
+    font-size: 16px;
+}
+
+/* Estilos para el botón de envío */
+.login-container button {
+    padding: 10px 20px;
+    background-color: #d9534f; 
+    color: white;
+    border: none;
+    border-radius: 4px; 
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container button:hover {
+    background-color: #c9302c; 
+}
+
+/* Estilos para el mensaje de error */
+.login-container p.error-message {
+    color: #d9534f; 
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-container button {
+    padding: 10px;
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-container button:hover {
+    background-color: #c9302c;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}

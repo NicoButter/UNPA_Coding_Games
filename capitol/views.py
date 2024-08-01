@@ -1,21 +1,23 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login
 from .forms import PersonajeCreationForm
+from .forms import CustomAuthenticationForm
+
 
 def home_view(request):
     return render(request, 'capitol/index.html')
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            auth_login(request, user)
-            return redirect('home')
-        else:
-            return render(request, 'capitol/login.html', {'error': 'Credenciales inválidas'})
-    return render(request, 'capitol/login.html')
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('home')  # Redirige a una página después del inicio de sesión
+    else:
+        form = CustomAuthenticationForm()
+
+    return render(request, 'capitol/login.html', {'form': form})
 
 def register(request):
     if request.method == 'POST':
