@@ -1,0 +1,98 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.mo
+*.sqlite3
+
+# If your project uses a database other than SQLite, ignore the database file
+*.db
+
+# Media files (optional)
+media/
+uploads/
+
+# Static files (optional)
+staticfiles/
+
+# Local environment configuration
+.env
+*.env
+
+# Virtual environment
+venv/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Test logs
+.tox/
+.pytest_cache/
+.junit/
+
+# mypy
+.mypy_cache/
+
+# Pylint
+.pylint.d/
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Sphinx documentation
+docs/_build/
+
+# Profiling data
+.prof
