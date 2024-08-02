@@ -1,0 +1,16 @@
+{% extends 'capitol/base.html' %}
+
+{% block content %}
+<div class="acreditacion-container">
+    <h2>Acreditar Tributo</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Acreditar</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'centro_control/css/acreditacion_styles.css' %}">
+{% endblock %}
