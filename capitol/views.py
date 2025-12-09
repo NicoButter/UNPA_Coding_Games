@@ -11,7 +11,7 @@ def home_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('dashboards:dashboard')
     
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, data=request.POST)
@@ -20,13 +20,8 @@ def login_view(request):
             login(request, user)
             messages.success(request, f'¡Bienvenido de vuelta, {user.get_full_name()}!')
             
-            # Redirigir según el rol
-            if user.rol == 'jefe_capitolio':
-                return redirect('admin:index')
-            elif user.rol == 'vigilante':
-                return redirect('centro_control:dashboard')
-            else:
-                return redirect('home')
+            # Redirigir al dashboard
+            return redirect('dashboards:dashboard')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
     else:

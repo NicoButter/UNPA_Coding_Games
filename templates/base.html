@@ -32,8 +32,9 @@
             <nav class="nav-links">
                 {% if user.is_authenticated %}
                     <a href="{% url 'perfil' %}">Mi Perfil</a>
-                    {% if user.rol == 'vigilante' or user.rol == 'jefe_capitolio' %}
-                        <a href="{% url 'centro_control:dashboard' %}">Centro de Control</a>
+                    <a href="{% url 'dashboards:dashboard' %}">Dashboard</a>
+                    {% if user.rol == 'jefe_capitolio' %}
+                        <a href="{% url 'admin:index' %}">Admin</a>
                     {% endif %}
                     <a href="{% url 'logout' %}">Salir</a>
                 {% else %}

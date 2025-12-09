@@ -1,0 +1,117 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_title %}Panel del Mentor{% endblock %}
+
+{% block dashboard_stats %}
+    {% include 'dashboards/components/stats_card.html' with title="Mis Tributos" value=stats.mis_tributos icon="👥" %}
+    {% include 'dashboards/components/stats_card.html' with title="En Competencia" value=stats.en_competencia icon="🎯" color="info" %}
+    {% include 'dashboards/components/stats_card.html' with title="Victorias" value=stats.victorias icon="🏆" color="success" %}
+    {% include 'dashboards/components/stats_card.html' with title="Distrito" value=stats.distrito icon="🏛️" %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-row">
+    <div class="dashboard-col-8">
+        <div class="dashboard-card">
+            <h3>👥 Tributos bajo mi Mentoría</h3>
+            <div class="tributos-grid">
+                {% for tributo in mis_tributos %}
+                <div class="tributo-card">
+                    <div class="tributo-header">
+                        {% if tributo.personaje.foto %}
+                            <img src="{{ tributo.personaje.foto.url }}" alt="{{ tributo.personaje.get_full_name }}" class="tributo-avatar">
+                        {% else %}
+                            <div class="tributo-avatar-placeholder">{{ tributo.personaje.first_name.0 }}{{ tributo.personaje.last_name.0 }}</div>
+                        {% endif %}
+                        <div class="tributo-info">
+                            <h4>{{ tributo.personaje.get_full_name }}</h4>
+                            <p class="tributo-code">{{ tributo.codigo_tributo }}</p>
+                        </div>
+                    </div>
+                    <div class="tributo-stats">
+                        <div class="stat">
+                            <span class="label">Nivel:</span>
+                            <span class="value">{{ tributo.get_nivel_display }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Estado:</span>
+                            <span class="status-badge status-{{ tributo.estado }}">{{ tributo.get_estado_display }}</span>
+                        </div>
+                    </div>
+                    <div class="tributo-actions">
+                        <button class="btn-sm">Ver Perfil</button>
+                        <button class="btn-sm">Entrenar</button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <p>Aún no tienes tributos asignados.</p>
+                    <p class="subtitle">Los tributos aparecerán aquí cuando sean asignados a tu distrito.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>📚 Programas de Entrenamiento</h3>
+            <div class="training-programs">
+                <div class="program-item">
+                    <div class="program-icon">💻</div>
+                    <div class="program-info">
+                        <h4>Algoritmos Básicos</h4>
+                        <p>Fundamentos de estructuras de datos</p>
+                        <div class="program-progress">
+                            <div class="progress-bar"><div class="progress-fill" style="width: 60%"></div></div>
+                            <span>60% completado</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="program-item">
+                    <div class="program-icon">🧮</div>
+                    <div class="program-info">
+                        <h4>Programación Dinámica</h4>
+                        <p>Optimización y memorización</p>
+                        <div class="program-progress">
+                            <div class="progress-bar"><div class="progress-fill" style="width: 30%"></div></div>
+                            <span>30% completado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-col-4">
+        {% include 'dashboards/components/quick_actions.html' with actions=mentor_actions %}
+        
+        <div class="dashboard-card">
+            <h3>📊 Rendimiento General</h3>
+            <div class="performance-chart">
+                <div class="chart-placeholder">
+                    <p>Gráfico de rendimiento</p>
+                    <p class="subtitle">Próximamente</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>🎯 Objetivos del Mes</h3>
+            <ul class="objectives-list">
+                <li class="objective-item completed">
+                    <span class="checkbox">✓</span>
+                    <span>Entrenar 5 tributos en algoritmos básicos</span>
+                </li>
+                <li class="objective-item">
+                    <span class="checkbox">☐</span>
+                    <span>Preparar material de estructuras de datos</span>
+                </li>
+                <li class="objective-item">
+                    <span class="checkbox">☐</span>
+                    <span>Realizar simulacro de competencia</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

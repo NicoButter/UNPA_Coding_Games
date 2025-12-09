@@ -1,0 +1,145 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_title %}Control del Capitolio{% endblock %}
+
+{% block dashboard_stats %}
+    {% include 'dashboards/components/stats_card.html' with title="Total Tributos" value=stats.total_tributos icon="👥" %}
+    {% include 'dashboards/components/stats_card.html' with title="Competencias Activas" value=stats.competencias_activas icon="🎮" color="info" %}
+    {% include 'dashboards/components/stats_card.html' with title="Mentores" value=stats.total_mentores icon="🎓" color="success" %}
+    {% include 'dashboards/components/stats_card.html' with title="Vigilantes" value=stats.total_vigilantes icon="👁️" color="warning" %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-row">
+    <div class="dashboard-col-8">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3>📊 Resumen Ejecutivo</h3>
+                <select class="filter-select">
+                    <option>Esta semana</option>
+                    <option>Este mes</option>
+                    <option>Este año</option>
+                </select>
+            </div>
+            <div class="executive-summary">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <h4>Nuevos Registros</h4>
+                        <p class="big-number">{{ stats.nuevos_registros }}</p>
+                        <span class="trend positive">↑ 12% vs. semana anterior</span>
+                    </div>
+                    <div class="summary-item">
+                        <h4>Participación</h4>
+                        <p class="big-number">{{ stats.tasa_participacion }}%</p>
+                        <span class="trend positive">↑ 5% vs. mes anterior</span>
+                    </div>
+                    <div class="summary-item">
+                        <h4>Competencias Completadas</h4>
+                        <p class="big-number">{{ stats.competencias_completadas }}</p>
+                        <span class="trend neutral">= Sin cambios</span>
+                    </div>
+                    <div class="summary-item">
+                        <h4>Satisfacción</h4>
+                        <p class="big-number">4.5/5</p>
+                        <span class="trend positive">↑ 0.3 puntos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>🏛️ Tributos por Distrito</h3>
+            <div class="district-overview">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Distrito</th>
+                            <th>Tributos</th>
+                            <th>UNPA</th>
+                            <th>Externos</th>
+                            <th>Acreditados</th>
+                            <th>Activos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for distrito in distritos_detalle %}
+                        <tr>
+                            <td><strong>Distrito {{ distrito.numero }}</strong></td>
+                            <td>{{ distrito.total }}</td>
+                            <td>{{ distrito.unpa }}</td>
+                            <td>{{ distrito.externos }}</td>
+                            <td><span class="badge badge-success">{{ distrito.acreditados }}</span></td>
+                            <td><span class="badge badge-info">{{ distrito.activos }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>📈 Actividad del Sistema</h3>
+            <div class="chart-placeholder">
+                <p>Gráfico de actividad en el tiempo</p>
+                <p class="subtitle">Implementación futura con Chart.js</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-col-4">
+        {% include 'dashboards/components/quick_actions.html' with actions=jefe_actions %}
+        
+        <div class="dashboard-card">
+            <h3>⚙️ Configuración Rápida</h3>
+            <div class="settings-list">
+                <a href="{% url 'admin:index' %}" class="setting-item">
+                    <span class="setting-icon">🔧</span>
+                    <span>Panel de Administración</span>
+                </a>
+                <a href="#" class="setting-item">
+                    <span class="setting-icon">📝</span>
+                    <span>Gestionar Competencias</span>
+                </a>
+                <a href="#" class="setting-item">
+                    <span class="setting-icon">👥</span>
+                    <span>Gestionar Usuarios</span>
+                </a>
+                <a href="#" class="setting-item">
+                    <span class="setting-icon">📊</span>
+                    <span>Reportes Avanzados</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>🔔 Notificaciones</h3>
+            <div class="notifications-list">
+                <div class="notification-item unread">
+                    <div class="notification-icon">👤</div>
+                    <div class="notification-content">
+                        <p><strong>5 nuevos tributos</strong> esperan acreditación</p>
+                        <span class="time">Hace 2 horas</span>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon">🏆</div>
+                    <div class="notification-content">
+                        <p>Competencia "Algoritmos Básicos" finalizada</p>
+                        <span class="time">Hace 1 día</span>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon">📧</div>
+                    <div class="notification-content">
+                        <p>Nuevo mensaje del mentor del Distrito 5</p>
+                        <span class="time">Hace 2 días</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'dashboards/components/recent_activity.html' %}
+    </div>
+</div>
+{% endblock %}

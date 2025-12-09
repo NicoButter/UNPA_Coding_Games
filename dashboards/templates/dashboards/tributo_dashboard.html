@@ -1,0 +1,92 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_title %}Panel del Tributo{% endblock %}
+
+{% block dashboard_stats %}
+    {% include 'dashboards/components/stats_card.html' with title="Mi Distrito" value=tributo_info.distrito icon="🏛️" %}
+    {% include 'dashboards/components/stats_card.html' with title="Nivel" value=tributo_info.get_nivel_display icon="⭐" %}
+    {% include 'dashboards/components/stats_card.html' with title="Estado" value=tributo_info.get_estado_display icon="🎯" %}
+    {% include 'dashboards/components/stats_card.html' with title="Código" value=tributo_info.codigo_tributo icon="🔖" %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-row">
+    <div class="dashboard-col-8">
+        <div class="dashboard-card">
+            <h3>📋 Mi Información</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Nombre Completo:</span>
+                    <span class="value">{{ user.get_full_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Email:</span>
+                    <span class="value">{{ user.email }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Tipo:</span>
+                    <span class="value">{{ tributo_info.get_tipo_display }}</span>
+                </div>
+                {% if tributo_info.unidad_academica %}
+                <div class="info-item">
+                    <span class="label">Unidad Académica:</span>
+                    <span class="value">{{ tributo_info.unidad_academica }}</span>
+                </div>
+                {% endif %}
+                {% if tributo_info.carrera %}
+                <div class="info-item">
+                    <span class="label">Carrera:</span>
+                    <span class="value">{{ tributo_info.carrera }} - Año {{ tributo_info.año_carrera }}</span>
+                </div>
+                {% endif %}
+                <div class="info-item">
+                    <span class="label">Lenguajes:</span>
+                    <span class="value">{{ tributo_info.lenguajes_programacion|default:"No especificado" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>🎮 Mis Competencias</h3>
+            <div class="empty-state">
+                <p>Aún no has participado en ninguna competencia.</p>
+                <p class="subtitle">Las competencias aparecerán aquí cuando se abran las inscripciones.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-col-4">
+        {% include 'dashboards/components/quick_actions.html' with actions=tributo_actions %}
+        
+        <div class="dashboard-card">
+            <h3>🏆 Mi Credencial</h3>
+            <div class="credential-preview">
+                {% if tributo_info.qr_code %}
+                    <div class="qr-code">
+                        <img src="{{ tributo_info.qr_code.url }}" alt="QR Code">
+                    </div>
+                    <p class="credential-code">{{ tributo_info.codigo_tributo }}</p>
+                    {% if tributo_info.estado == 'acreditado' %}
+                        <span class="badge badge-success">✓ Acreditado</span>
+                    {% else %}
+                        <span class="badge badge-warning">⏳ Pendiente</span>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Credencial en generación...</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>💡 Consejos</h3>
+            <ul class="tips-list">
+                <li>Mantén tu perfil actualizado</li>
+                <li>Practica regularmente en la arena de entrenamiento</li>
+                <li>Revisa los desafíos disponibles</li>
+                <li>Participa en las competencias para ganar experiencia</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

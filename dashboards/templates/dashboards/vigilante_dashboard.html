@@ -1,0 +1,123 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% load static %}
+
+{% block dashboard_title %}Centro de Control - Vigilante{% endblock %}
+
+{% block dashboard_stats %}
+    {% include 'dashboards/components/stats_card.html' with title="Total Tributos" value=stats.total_tributos icon="👥" %}
+    {% include 'dashboards/components/stats_card.html' with title="Pendientes" value=stats.pendientes icon="⏳" color="warning" %}
+    {% include 'dashboards/components/stats_card.html' with title="Acreditados" value=stats.acreditados icon="✓" color="success" %}
+    {% include 'dashboards/components/stats_card.html' with title="En Competencia" value=stats.activos icon="🎯" color="info" %}
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-row">
+    <div class="dashboard-col-8">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3>📋 Tributos Recientes</h3>
+                <a href="{% url 'admin:capitol_tributoinfo_changelist' %}" class="btn-link">Ver todos</a>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Distrito</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tributo in tributos_recientes %}
+                        <tr>
+                            <td><code>{{ tributo.codigo_tributo }}</code></td>
+                            <td>{{ tributo.personaje.get_full_name }}</td>
+                            <td>
+                                <span class="badge badge-{{ tributo.tipo|default:'secondary' }}">
+                                    {{ tributo.get_tipo_display }}
+                                </span>
+                            </td>
+                            <td>Distrito {{ tributo.distrito }}</td>
+                            <td>
+                                <span class="status-badge status-{{ tributo.estado }}">
+                                    {{ tributo.get_estado_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if tributo.estado == 'pendiente' %}
+                                    <a href="#" class="btn-sm btn-primary" onclick="acreditar({{ tributo.id }})">Acreditar</a>
+                                {% endif %}
+                                <a href="#" class="btn-sm btn-info">Ver QR</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No hay tributos registrados</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% include 'dashboards/components/recent_activity.html' %}
+    </div>
+
+    <div class="dashboard-col-4">
+        {% include 'dashboards/components/quick_actions.html' with actions=vigilante_actions %}
+        
+        <div class="dashboard-card">
+            <h3>📊 Estadísticas por Distrito</h3>
+            <div class="distrito-stats">
+                {% for distrito in distritos_stats %}
+                <div class="distrito-item">
+                    <div class="distrito-info">
+                        <span class="distrito-number">Distrito {{ distrito.numero }}</span>
+                        <span class="distrito-count">{{ distrito.count }} tributos</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ distrito.percentage }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>⚠️ Alertas</h3>
+            <div class="alerts-list">
+                {% if stats.pendientes > 0 %}
+                <div class="alert-item warning">
+                    <span class="alert-icon">⏳</span>
+                    <div>
+                        <strong>{{ stats.pendientes }} tributos pendientes</strong>
+                        <p>Requieren acreditación</p>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="alert-item info">
+                    <span class="alert-icon">📅</span>
+                    <div>
+                        <strong>Próxima competencia</strong>
+                        <p>Fecha por anunciar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function acreditar(tributoId) {
+    if (confirm('¿Confirmar acreditación de este tributo?')) {
+        // Aquí iría la lógica AJAX para acreditar
+        window.location.href = `/centro_control/acreditar/${tributoId}/`;
+    }
+}
+</script>
+{% endblock %}
