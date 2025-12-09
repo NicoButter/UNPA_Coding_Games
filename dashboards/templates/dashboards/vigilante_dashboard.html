@@ -48,7 +48,7 @@
                             </td>
                             <td>
                                 {% if tributo.estado == 'pendiente' %}
-                                    <a href="#" class="btn-sm btn-primary" onclick="acreditar({{ tributo.id }})">Acreditar</a>
+                                    <a href="{% url 'centro_control:acreditar_tributo' tributo.id %}" class="btn-sm btn-primary">Acreditar</a>
                                 {% endif %}
                                 <a href="#" class="btn-sm btn-info">Ver QR</a>
                             </td>
@@ -79,7 +79,7 @@
                         <span class="distrito-count">{{ distrito.count }} tributos</span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ distrito.percentage }}%"></div>
+                        <div class="progress-fill" data-width="{{ distrito.percentage }}"></div>
                     </div>
                 </div>
                 {% endfor %}
@@ -113,11 +113,9 @@
 
 {% block extra_scripts %}
 <script>
-function acreditar(tributoId) {
-    if (confirm('¿Confirmar acreditación de este tributo?')) {
-        // Aquí iría la lógica AJAX para acreditar
-        window.location.href = `/centro_control/acreditar/${tributoId}/`;
-    }
-}
+// Aplicar anchos a las barras de progreso
+document.querySelectorAll('.progress-fill[data-width]').forEach(el => {
+    el.style.width = el.dataset.width + '%';
+});
 </script>
 {% endblock %}
