@@ -1,0 +1,15 @@
+{% comment %}
+Componente: Tarjeta de estadística
+Uso: {% include 'dashboards/components/stats_card.html' with title="Total" value="123" icon="🔥" color="gold" %}
+{% endcomment %}
+
+<div class="stat-card stat-card-{{ color|default:'default' }}">
+    <div class="stat-icon">{{ icon|default:'📊' }}</div>
+    <div class="stat-content">
+        <h3 class="stat-title">{{ title }}</h3>
+        <p class="stat-value">{{ value }}</p>
+        {% if subtitle %}
+            <span class="stat-subtitle">{{ subtitle }}</span>
+        {% endif %}
+    </div>
+</div>

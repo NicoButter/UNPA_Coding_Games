@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}The Coding Games{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Base styles -->
+    <link rel="stylesheet" href="{% static 'css/base_styles.css' %}">
+    
+    <!-- Extra styles from child templates -->
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'images/logo_redondo_UNPA.png' %}" alt="Logo UNPA">
+                </a>
+            </div>
+            <div class="title">
+                <h1>🔥 Coding Games 🔥</h1>
+                <p class="subtitle">Hunger Games de Programación - UNPA</p>
+            </div>
+            <nav class="nav-links">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'perfil' %}">Mi Perfil</a>
+                    {% if user.rol == 'vigilante' or user.rol == 'jefe_capitolio' %}
+                        <a href="{% url 'centro_control:dashboard' %}">Centro de Control</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}">Salir</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Ingreso al Capitolio</a>
+                    <a href="{% url 'register' %}">Acreditarse como Tributo</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Mensajes del sistema -->
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                        <button class="close-alert" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Contenido de las páginas -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024-2025 UNPA - The Coding Games | "Que los odds estén siempre a tu favor"</p>
+    </footer>
+
+    <!-- Scripts adicionales -->
+    {% block extra_scripts %}{% endblock %}
+    
+</body>
+</html>

@@ -1,12 +1,233 @@
-{% extends 'capitol/base.html' %}
+{% extends 'base.html' %}
 
 {% load static %}
 
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'capitol/css/register_styles.css' %}">
+{% endblock %}
+
 {% block content %}
-    <h2>Registro de Usuario</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Registrar</button>
-    </form>
+<div class="register-container">
+    <div class="register-header">
+        <h1>🔥 Acreditación de Tributos 🔥</h1>
+        <p>"Que los odds estén siempre a tu favor"</p>
+    </div>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="register-card">
+        <form method="post" enctype="multipart/form-data" id="registerForm">
+            {% csrf_token %}
+            
+            <!-- Sección: Información Personal -->
+            <div class="form-section">
+                <h3 class="section-title">Información Personal</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ user_form.first_name.id_for_label }}" class="form-label">Nombre *</label>
+                        {{ user_form.first_name }}
+                        {{ user_form.first_name.errors }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Apellido *</label>
+                        {{ user_form.last_name }}
+                        {{ user_form.last_name.errors }}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ user_form.email.id_for_label }}" class="form-label">Email *</label>
+                        {{ user_form.email }}
+                        {{ user_form.email.errors }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ user_form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+                        {{ user_form.telefono }}
+                        {{ user_form.telefono.errors }}
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ user_form.fecha_nacimiento.id_for_label }}" class="form-label">Fecha de Nacimiento</label>
+                        {{ user_form.fecha_nacimiento }}
+                        {{ user_form.fecha_nacimiento.errors }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ user_form.foto.id_for_label }}" class="form-label">Foto para Credencial</label>
+                        {{ user_form.foto }}
+                        <span class="helptext">Foto tipo carnet para tu pase de tributo</span>
+                        {{ user_form.foto.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Credenciales de Acceso -->
+            <div class="form-section">
+                <h3 class="section-title">Credenciales de Acceso</h3>
+                
+                <div class="form-group">
+                    <label for="{{ user_form.username.id_for_label }}" class="form-label">Nombre de Usuario *</label>
+                    {{ user_form.username }}
+                    {{ user_form.username.errors }}
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ user_form.password1.id_for_label }}" class="form-label">Contraseña *</label>
+                        {{ user_form.password1 }}
+                        {{ user_form.password1.errors }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ user_form.password2.id_for_label }}" class="form-label">Confirmar Contraseña *</label>
+                        {{ user_form.password2 }}
+                        {{ user_form.password2.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Información del Tributo -->
+            <div class="form-section">
+                <h3 class="section-title">Información del Tributo</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ tributo_form.tipo.id_for_label }}" class="form-label">Tipo de Participante *</label>
+                        {{ tributo_form.tipo }}
+                        {{ tributo_form.tipo.errors }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ tributo_form.nivel.id_for_label }}" class="form-label">Nivel de Experiencia *</label>
+                        {{ tributo_form.nivel }}
+                        {{ tributo_form.nivel.errors }}
+                    </div>
+                </div>
+
+                <!-- Campos condicionales para alumnos UNPA -->
+                <div id="unpa-fields" class="conditional-field">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ tributo_form.unidad_academica.id_for_label }}" class="form-label">Unidad Académica UNPA</label>
+                            {{ tributo_form.unidad_academica }}
+                            {{ tributo_form.unidad_academica.errors }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ tributo_form.carrera.id_for_label }}" class="form-label">Carrera</label>
+                            {{ tributo_form.carrera }}
+                            {{ tributo_form.carrera.errors }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ tributo_form.año_carrera.id_for_label }}" class="form-label">Año de Carrera</label>
+                        {{ tributo_form.año_carrera }}
+                        {{ tributo_form.año_carrera.errors }}
+                    </div>
+                </div>
+
+                <!-- Campos condicionales para externos -->
+                <div id="external-fields" class="conditional-field">
+                    <div class="form-group">
+                        <label for="{{ tributo_form.institucion_origen.id_for_label }}" class="form-label">Institución de Origen</label>
+                        {{ tributo_form.institucion_origen }}
+                        {{ tributo_form.institucion_origen.errors }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ tributo_form.ciudad.id_for_label }}" class="form-label">Ciudad</label>
+                        {{ tributo_form.ciudad }}
+                        {{ tributo_form.ciudad.errors }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ tributo_form.provincia.id_for_label }}" class="form-label">Provincia</label>
+                        {{ tributo_form.provincia }}
+                        {{ tributo_form.provincia.errors }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ tributo_form.distrito.id_for_label }}" class="form-label">Distrito *</label>
+                    {{ tributo_form.distrito }}
+                    <span class="helptext">Tu distrito de origen (1-13)</span>
+                    {{ tributo_form.distrito.errors }}
+                </div>
+            </div>
+
+            <!-- Sección: Habilidades -->
+            <div class="form-section">
+                <h3 class="section-title">Habilidades y Experiencia</h3>
+                
+                <div class="form-group">
+                    <label for="{{ tributo_form.lenguajes_programacion.id_for_label }}" class="form-label">Lenguajes de Programación</label>
+                    {{ tributo_form.lenguajes_programacion }}
+                    <span class="helptext">Ej: Python, Java, C++, JavaScript (separados por comas)</span>
+                    {{ tributo_form.lenguajes_programacion.errors }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ tributo_form.experiencia_previa.id_for_label }}" class="form-label">Experiencia Previa</label>
+                    {{ tributo_form.experiencia_previa }}
+                    <span class="helptext">Cuéntanos sobre tu experiencia en programación competitiva o proyectos</span>
+                    {{ tributo_form.experiencia_previa.errors }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ tributo_form.motivacion.id_for_label }}" class="form-label">Motivación</label>
+                    {{ tributo_form.motivacion }}
+                    <span class="helptext">¿Por qué quieres participar en los Hunger Games de Código?</span>
+                    {{ tributo_form.motivacion.errors }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                🔥 Registrarse como Tributo 🔥
+            </button>
+        </form>
+
+        <div class="register-footer">
+            <p>¿Ya tienes cuenta? <a href="{% url 'login' %}" style="color: #d4af37; font-weight: bold;">Inicia sesión aquí</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mostrar/ocultar campos según el tipo de participante
+    document.addEventListener('DOMContentLoaded', function() {
+        const tipoSelect = document.getElementById('{{ tributo_form.tipo.id_for_label }}');
+        const unpaFields = document.getElementById('unpa-fields');
+        const externalFields = document.getElementById('external-fields');
+        
+        function toggleFields() {
+            if (tipoSelect.value === 'alumno_unpa') {
+                unpaFields.classList.add('show');
+                externalFields.classList.remove('show');
+            } else {
+                unpaFields.classList.remove('show');
+                externalFields.classList.add('show');
+            }
+        }
+        
+        tipoSelect.addEventListener('change', toggleFields);
+        toggleFields(); // Llamar al cargar la página
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'dashboards/css/dashboard_styles.css' %}">
+    {% block dashboard_extra_styles %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <h1>{% block dashboard_title %}Dashboard{% endblock %}</h1>
+            <p class="dashboard-subtitle">{% block dashboard_subtitle %}Bienvenido{% endblock %}</p>
+        </div>
+        <div class="dashboard-user-info">
+            <div class="user-avatar">
+                {% if user.foto %}
+                    <img src="{{ user.foto.url }}" alt="{{ user.get_full_name }}">
+                {% else %}
+                    <div class="avatar-placeholder">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="user-details">
+                <strong>{{ user.get_full_name }}</strong>
+                <span class="user-role">{{ user.get_rol_display }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas principales -->
+    <div class="stats-grid">
+        {% block dashboard_stats %}{% endblock %}
+    </div>
+
+    <!-- Contenido principal del dashboard -->
+    <div class="dashboard-content">
+        {% block dashboard_content %}{% endblock %}
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="quick-actions">
+        {% block dashboard_actions %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+    {% block dashboard_scripts %}{% endblock %}
+{% endblock %}

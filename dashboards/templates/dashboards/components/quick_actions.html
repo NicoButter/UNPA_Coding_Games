@@ -1,0 +1,16 @@
+{% comment %}
+Componente: Acciones rápidas
+Uso: {% include 'dashboards/components/quick_actions.html' with actions=action_list %}
+{% endcomment %}
+
+<div class="quick-actions-panel">
+    <h3 class="panel-title">⚡ Acciones Rápidas</h3>
+    <div class="actions-grid">
+        {% for action in actions %}
+            <a href="{{ action.url }}" class="action-button action-{{ action.type|default:'default' }}">
+                <span class="action-icon">{{ action.icon }}</span>
+                <span class="action-label">{{ action.label }}</span>
+            </a>
+        {% endfor %}
+    </div>
+</div>

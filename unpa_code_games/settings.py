@@ -56,8 +56,8 @@ ROOT_URLCONF = "unpa_code_games.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "templates"],  # Templates globales en la raíz
+        "APP_DIRS": True,  # Permite que cada app tenga su propio directorio templates
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -76,15 +76,22 @@ WSGI_APPLICATION = "unpa_code_games.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'unpa_code_games',
-        'USER': 'nicolas',
-        'PASSWORD': 'nicolas010203',
-        'HOST': 'localhost',
-        'PORT': '5432',
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#      'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'unpa_code_games',
+#         'USER': 'nicolas',
+#         'PASSWORD': 'nicolas010203',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
