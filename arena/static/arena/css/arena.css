@@ -1,0 +1,295 @@
+/* Estilos para el Arena (vista principal de retos) */
+
+.arena-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.arena-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.header-info h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+}
+
+.distrito-info {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.arena-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat-box {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+}
+
+.timer-box.warning {
+    background: rgba(231, 76, 60, 0.3);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.retos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.reto-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-left: 4px solid #95a5a6;
+}
+
+.reto-card.estado-completado {
+    border-left-color: #27ae60;
+}
+
+.reto-card.estado-en_progreso {
+    border-left-color: #f39c12;
+}
+
+.reto-card.estado-fallido {
+    border-left-color: #e74c3c;
+}
+
+.reto-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.reto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+}
+
+.reto-dificultad {
+    font-size: 1.2rem;
+}
+
+.reto-dificultad.dificultad-novato {
+    color: #27ae60;
+}
+
+.reto-dificultad.dificultad-intermedio {
+    color: #f39c12;
+}
+
+.reto-dificultad.dificultad-avanzado {
+    color: #e67e22;
+}
+
+.reto-dificultad.dificultad-experto {
+    color: #e74c3c;
+}
+
+.reto-estado-badge .badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+}
+
+.badge-success {
+    background-color: #27ae60;
+    color: white;
+}
+
+.badge-warning {
+    background-color: #f39c12;
+    color: white;
+}
+
+.badge-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.badge-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.reto-body {
+    padding: 1.5rem;
+}
+
+.reto-body h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: 1.3rem;
+}
+
+.reto-descripcion {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.reto-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #34495e;
+}
+
+.info-row strong {
+    color: #2c3e50;
+}
+
+.puntos-obtenidos {
+    background-color: #ecf0f1;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+.puntos-obtenidos strong {
+    color: #27ae60;
+    font-size: 1.1rem;
+}
+
+.reto-footer {
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+.reto-footer .btn {
+    width: 100%;
+    text-align: center;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-success {
+    background-color: #27ae60;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #229954;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.arena-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .arena-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .arena-stats {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .stat-box {
+        width: 100%;
+    }
+    
+    .retos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .arena-actions {
+        flex-direction: column;
+    }
+}

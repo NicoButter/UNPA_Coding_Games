@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
 import qrcode
 from io import BytesIO
@@ -18,6 +19,21 @@ class Personaje(AbstractUser):
     telefono = models.CharField(max_length=15, blank=True, null=True)
     fecha_nacimiento = models.DateField(blank=True, null=True)
     foto = models.ImageField(upload_to='tributos/fotos/', blank=True, null=True)
+    
+    # Campos específicos para mentores
+    unidad_academica = models.CharField(
+        max_length=200, 
+        blank=True, 
+        null=True,
+        verbose_name='Unidad Académica',
+        help_text='Unidad Académica/Sede UNPA que representa (solo para mentores)'
+    )
+    distrito_asignado = models.IntegerField(
+        blank=True, 
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(13)],
+        help_text='Distrito asignado al mentor (1-13)'
+    )
     
     def __str__(self):
         return f"{self.get_full_name()} ({self.username})"
@@ -44,6 +60,18 @@ class TributoInfo(models.Model):
     
     # Relación con usuario
     personaje = models.OneToOneField(Personaje, on_delete=models.CASCADE, related_name='tributo_info')
+    
+    # Relación jerárquica con mentor
+    mentor = models.ForeignKey(
+        Personaje,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tributos_asignados',
+        limit_choices_to={'rol': 'mentor'},
+        verbose_name='Mentor Asignado',
+        help_text='Mentor que representa al tributo (su "Haymitch")'
+    )
     
     # Información de identificación
     codigo_tributo = models.CharField(max_length=20, unique=True, editable=False, blank=True)
@@ -86,6 +114,9 @@ class TributoInfo(models.Model):
         ordering = ['-fecha_registro']
     
     def save(self, *args, **kwargs):
+        # Detectar si es una creación nueva
+        is_new = self.pk is None
+        
         # Generar código de tributo si no existe
         if not self.codigo_tributo:
             self.codigo_tributo = self.generar_codigo_tributo()
@@ -95,6 +126,12 @@ class TributoInfo(models.Model):
             self.generar_qr_code()
         
         super().save(*args, **kwargs)
+        
+        # Si es nuevo y no se ha enviado credencial, enviar email
+        if is_new and not self.credencial_generada:
+            # Importar aquí para evitar import circular
+            from .views import enviar_gafete_email
+            enviar_gafete_email(self)
     
     def generar_codigo_tributo(self):
         """Genera un código único para el tributo (ej: T-12-045)"""

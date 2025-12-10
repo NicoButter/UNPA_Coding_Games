@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ reto.titulo }} - UNPA Coding Games{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'arena/css/resolver.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="resolver-container">
+    <!-- Barra superior con info del reto -->
+    <div class="reto-info-bar">
+        <a href="{% url 'arena:arena_torneo' torneo.id %}" class="btn btn-sm btn-secondary">← Volver al Arena</a>
+        <h2>{{ reto.titulo }}</h2>
+        <div class="reto-puntos">
+            <span>💰 {{ reto.puntos_base }} pts</span>
+            {% if reto.puntos_bonus %}<span class="bonus">+{{ reto.puntos_bonus }} bonus</span>{% endif %}
+        </div>
+    </div>
+
+    <div class="resolver-layout">
+        <!-- Panel izquierdo: Enunciado -->
+        <div class="panel-enunciado">
+            <div class="panel-header">
+                <h3>📋 Enunciado</h3>
+                <span class="dificultad-badge dificultad-{{ reto.dificultad }}">
+                    {{ reto.get_dificultad_display }}
+                </span>
+            </div>
+            
+            <div class="panel-content">
+                <div class="enunciado-texto">
+                    {{ reto.enunciado|linebreaks }}
+                </div>
+
+                {% if casos_ejemplo %}
+                <div class="ejemplos-section">
+                    <h4>💡 Ejemplos</h4>
+                    {% for caso in casos_ejemplo %}
+                    <div class="ejemplo-card">
+                        <h5>{{ caso.nombre }}</h5>
+                        <div class="ejemplo-content">
+                            <div class="ejemplo-input">
+                                <strong>Entrada:</strong>
+                                <pre>{{ caso.entrada }}</pre>
+                            </div>
+                            <div class="ejemplo-output">
+                                <strong>Salida Esperada:</strong>
+                                <pre>{{ caso.salida_esperada }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="info-adicional">
+                    <p><strong>Tipo:</strong> {{ reto.get_tipo_display }}</p>
+                    <p><strong>Lenguajes permitidos:</strong> {{ reto.lenguajes_permitidos|default:"python" }}</p>
+                    {% if reto.fecha_limite %}
+                    <p><strong>Fecha límite:</strong> {{ reto.fecha_limite|date:"d/m/Y H:i" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel derecho: Editor y resultados -->
+        <div class="panel-editor">
+            <div class="panel-header">
+                <h3>💻 Tu Solución</h3>
+                <div class="estado-actual">
+                    {% if participacion.estado == 'completado' %}
+                        <span class="badge badge-success">✅ Completado</span>
+                    {% elif participacion.estado == 'en_progreso' %}
+                        <span class="badge badge-warning">⏳ En Progreso</span>
+                    {% elif participacion.estado == 'fallido' %}
+                        <span class="badge badge-danger">Intento {{ participacion.numero_intento }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form id="solucionForm" method="post">
+                {% csrf_token %}
+                <div class="editor-controls">
+                    <label for="id_lenguaje">Lenguaje:</label>
+                    {{ form.lenguaje }}
+                </div>
+
+                <div class="code-editor-wrapper">
+                    {{ form.codigo_solucion }}
+                </div>
+
+                <div class="submit-controls">
+                    <button type="submit" id="btnValidar" class="btn btn-primary btn-lg">
+                        🚀 Enviar Solución
+                    </button>
+                    <button type="button" id="btnLimpiar" class="btn btn-secondary">
+                        🗑️ Limpiar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Panel de resultados -->
+            <div id="resultadosPanel" class="resultados-panel" style="display: none;">
+                <div class="panel-header">
+                    <h3>📊 Resultados</h3>
+                </div>
+                <div id="resultadosContent" class="resultados-content">
+                    <!-- Se llenará dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Validando tu solución...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+<script src="{% static 'arena/js/resolver.js' %}"></script>
+<script>
+    // Configurar CodeMirror para el editor
+    const textarea = document.getElementById('id_codigo_solucion');
+    const editor = CodeMirror.fromTextArea(textarea, {
+        mode: 'python',
+        theme: 'monokai',
+        lineNumbers: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        indentUnit: 4,
+        indentWithTabs: false,
+        lineWrapping: true,
+    });
+
+    // Cambiar modo según lenguaje seleccionado
+    document.getElementById('id_lenguaje').addEventListener('change', function() {
+        const lenguaje = this.value;
+        const modos = {
+            'python': 'python',
+            'javascript': 'javascript',
+            'java': 'text/x-java',
+            'cpp': 'text/x-c++src',
+        };
+        editor.setOption('mode', modos[lenguaje] || 'python');
+    });
+
+    // Botón limpiar
+    document.getElementById('btnLimpiar').addEventListener('click', function() {
+        if (confirm('¿Estás seguro de limpiar el código?')) {
+            editor.setValue('');
+        }
+    });
+
+    // Submit form con AJAX
+    document.getElementById('solucionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Actualizar textarea con contenido del editor
+        editor.save();
+        
+        const formData = new FormData(this);
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const resultadosPanel = document.getElementById('resultadosPanel');
+        
+        loadingOverlay.style.display = 'flex';
+        
+        fetch('{% url "arena:validar_solucion" reto.id %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingOverlay.style.display = 'none';
+            
+            if (data.error) {
+                alert('Error: ' + data.error);
+                return;
+            }
+            
+            // Mostrar resultados
+            mostrarResultados(data);
+            resultadosPanel.style.display = 'block';
+            resultadosPanel.scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(error => {
+            loadingOverlay.style.display = 'none';
+            alert('Error al validar la solución: ' + error);
+        });
+    });
+
+    function mostrarResultados(data) {
+        const content = document.getElementById('resultadosContent');
+        
+        let html = `
+            <div class="resultado-resumen ${data.completado ? 'success' : 'partial'}">
+                <h4>${data.completado ? '✅ ¡Reto Completado!' : '⚠️ Algunos casos fallaron'}</h4>
+                <div class="resumen-stats">
+                    <div class="stat">
+                        <span class="stat-label">Casos Pasados:</span>
+                        <span class="stat-value">${data.casos_pasados}/${data.casos_totales}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Puntos Obtenidos:</span>
+                        <span class="stat-value">${data.puntos_obtenidos}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="casos-detalle">
+                <h5>Detalle de Casos de Prueba:</h5>
+        `;
+        
+        data.resultados.forEach((resultado, index) => {
+            html += `
+                <div class="caso-resultado ${resultado.correcto ? 'correcto' : 'incorrecto'}">
+                    <div class="caso-header">
+                        <span class="caso-numero">#${index + 1}</span>
+                        <span class="caso-nombre">${resultado.caso}</span>
+                        <span class="caso-estado">${resultado.correcto ? '✅ Correcto' : '❌ Incorrecto'}</span>
+                    </div>
+                    ${resultado.es_visible ? `
+                        <div class="caso-detalles">
+                            <div class="detalle-item">
+                                <strong>Entrada:</strong>
+                                <pre>${resultado.entrada}</pre>
+                            </div>
+                            <div class="detalle-item">
+                                <strong>Salida Esperada:</strong>
+                                <pre>${resultado.salida_esperada}</pre>
+                            </div>
+                            <div class="detalle-item">
+                                <strong>Tu Salida:</strong>
+                                <pre>${resultado.salida_obtenida || resultado.error}</pre>
+                            </div>
+                        </div>
+                    ` : '<p class="caso-oculto">Este caso de prueba es privado</p>'}
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        if (data.completado) {
+            html += `
+                <div class="siguiente-accion">
+                    <a href="{% url 'arena:arena_torneo' torneo.id %}" class="btn btn-success btn-lg">
+                        🎯 Siguiente Reto
+                    </a>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="siguiente-accion">
+                    <p>💪 ¡Sigue intentando! Revisa los casos fallidos y ajusta tu código.</p>
+                </div>
+            `;
+        }
+        
+        content.innerHTML = html;
+    }
+</script>
+{% endblock %}

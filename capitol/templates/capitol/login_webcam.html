@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login con Webcam - UNPA Coding Games{% endblock %}
+
+{% block extra_css %}
+<style>
+    .webcam-login-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+    
+    .webcam-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .webcam-header h1 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .webcam-header p {
+        color: #7f8c8d;
+    }
+    
+    .webcam-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .video-container {
+        position: relative;
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+        max-width: 640px;
+        margin: 0 auto;
+    }
+    
+    #video {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .scanning-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        border: 3px solid #3498db;
+        border-radius: 8px;
+        box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.3);
+        pointer-events: none;
+    }
+    
+    .scanning-overlay::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #3498db;
+        animation: scan 2s linear infinite;
+    }
+    
+    @keyframes scan {
+        0%, 100% { top: 0; }
+        50% { top: calc(100% - 2px); }
+    }
+    
+    .status-box {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .status-waiting {
+        background: #ecf0f1;
+        color: #7f8c8d;
+    }
+    
+    .status-scanning {
+        background: #3498db;
+        color: white;
+        animation: pulse 1.5s infinite;
+    }
+    
+    .status-success {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .status-error {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .instructions {
+        background: #f8f9fa;
+        border-left: 4px solid #3498db;
+        padding: 1.5rem;
+        border-radius: 4px;
+        margin-bottom: 2rem;
+    }
+    
+    .instructions h3 {
+        margin-top: 0;
+        color: #2c3e50;
+    }
+    
+    .instructions ol {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+    
+    .instructions li {
+        margin-bottom: 0.5rem;
+        color: #34495e;
+    }
+    
+    .alternative-login {
+        text-align: center;
+        padding: 1rem;
+        background: #ecf0f1;
+        border-radius: 8px;
+    }
+    
+    .alternative-login a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .alternative-login a:hover {
+        text-decoration: underline;
+    }
+    
+    canvas {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="webcam-login-container">
+    <div class="webcam-header">
+        <h1>🎮 Acceso al Arena</h1>
+        <p>Escanea tu código QR para ingresar</p>
+    </div>
+    
+    <div class="instructions">
+        <h3>📋 Instrucciones</h3>
+        <ol>
+            <li>Permite el acceso a la cámara cuando se solicite</li>
+            <li>Coloca tu gafete con el código QR frente a la cámara</li>
+            <li>Mantén el QR dentro del marco azul</li>
+            <li>El sistema te autenticará automáticamente</li>
+            <li>Serás redirigido a tu dashboard</li>
+        </ol>
+    </div>
+    
+    <div class="webcam-box">
+        <div class="video-container">
+            <video id="video" playsinline></video>
+            <div class="scanning-overlay"></div>
+        </div>
+        
+        <div id="status" class="status-box status-waiting">
+            📷 Iniciando cámara...
+        </div>
+    </div>
+    
+    <div class="alternative-login">
+        <p>¿Problemas con la cámara? <a href="{% url 'login' %}">Usar login tradicional</a></p>
+    </div>
+</div>
+
+<canvas id="canvas" hidden></canvas>
+
+<!-- Biblioteca jsQR para escaneo de QR -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const statusBox = document.getElementById('status');
+    const ctx = canvas.getContext('2d');
+    
+    let scanning = true;
+    let lastScanTime = 0;
+    
+    // Iniciar cámara
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' } // Preferir cámara trasera
+            });
+            
+            video.srcObject = stream;
+            video.setAttribute('playsinline', true);
+            video.play();
+            
+            updateStatus('Coloca tu QR frente a la cámara', 'scanning');
+            
+            // Iniciar escaneo
+            requestAnimationFrame(tick);
+            
+        } catch (err) {
+            console.error('Error al acceder a la cámara:', err);
+            updateStatus('❌ No se pudo acceder a la cámara. Verifica los permisos.', 'error');
+        }
+    }
+    
+    function tick() {
+        if (!scanning) return;
+        
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: 'dontInvert',
+            });
+            
+            if (code) {
+                // QR detectado
+                const now = Date.now();
+                
+                // Evitar múltiples escaneos del mismo código (debounce de 3 segundos)
+                if (now - lastScanTime > 3000) {
+                    lastScanTime = now;
+                    handleQRCode(code.data);
+                }
+            }
+        }
+        
+        requestAnimationFrame(tick);
+    }
+    
+    async function handleQRCode(qrData) {
+        console.log('QR detectado:', qrData);
+        
+        // El QR contiene el UUID del token
+        // Formato esperado: UUID directo o URL con el UUID
+        let qrToken = qrData;
+        
+        // Si es una URL, extraer el UUID
+        if (qrData.includes('://')) {
+            const url = new URL(qrData);
+            qrToken = url.pathname.split('/').pop() || qrData;
+        }
+        
+        updateStatus('✅ QR detectado. Autenticando...', 'success');
+        scanning = false;
+        
+        try {
+            const response = await fetch('{% url "login_webcam" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: `qr_token=${encodeURIComponent(qrToken)}`
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                updateStatus('🎉 ¡Bienvenido! Redirigiendo...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = data.redirect_url;
+                }, 1500);
+                
+            } else if (data.codigo === 'NOT_ACCREDITED') {
+                updateStatus('⚠️ Debes acreditarte primero con el vigilante', 'error');
+                
+                setTimeout(() => {
+                    scanning = true;
+                    updateStatus('Coloca tu QR frente a la cámara', 'scanning');
+                    requestAnimationFrame(tick);
+                }, 3000);
+                
+            } else {
+                updateStatus(`❌ ${data.error || 'Error al autenticar'}`, 'error');
+                
+                setTimeout(() => {
+                    scanning = true;
+                    updateStatus('Coloca tu QR frente a la cámara', 'scanning');
+                    requestAnimationFrame(tick);
+                }, 3000);
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            updateStatus('❌ Error de conexión. Intenta nuevamente.', 'error');
+            
+            setTimeout(() => {
+                scanning = true;
+                updateStatus('Coloca tu QR frente a la cámara', 'scanning');
+                requestAnimationFrame(tick);
+            }, 3000);
+        }
+    }
+    
+    function updateStatus(message, type) {
+        statusBox.textContent = message;
+        statusBox.className = `status-box status-${type}`;
+    }
+    
+    // Iniciar al cargar la página
+    window.addEventListener('load', startCamera);
+    
+    // Detener cámara al salir
+    window.addEventListener('beforeunload', () => {
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+    });
+</script>
+{% endblock %}

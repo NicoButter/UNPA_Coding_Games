@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Torneos Disponibles - UNPA Coding Games{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'arena/css/torneos.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="torneos-container">
+    <div class="page-header">
+        <h1>🏆 Torneos Disponibles</h1>
+        <p>Selecciona un torneo para participar</p>
+    </div>
+
+    {% if torneos %}
+        <div class="torneos-grid">
+            {% for torneo in torneos %}
+            <div class="torneo-card {% if torneo.estado == 'en_curso' %}activo{% endif %}">
+                <div class="torneo-header">
+                    {% if torneo.imagen %}
+                        <img src="{{ torneo.imagen.url }}" alt="{{ torneo.nombre }}">
+                    {% else %}
+                        <div class="torneo-placeholder">🎮</div>
+                    {% endif %}
+                </div>
+                
+                <div class="torneo-body">
+                    <h3>{{ torneo.nombre }}</h3>
+                    <p class="torneo-edicion">Edición {{ torneo.edicion }}</p>
+                    <p class="torneo-descripcion">{{ torneo.descripcion|truncatewords:20 }}</p>
+                    
+                    <div class="torneo-info">
+                        <div class="info-item">
+                            <span class="label">Estado:</span>
+                            <span class="badge badge-{{ torneo.estado }}">
+                                {% if torneo.estado == 'inscripcion' %}📝 Inscripción
+                                {% elif torneo.estado == 'en_curso' %}🔥 En Curso
+                                {% elif torneo.estado == 'finalizado' %}✅ Finalizado
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="label">Inicio:</span>
+                            <span>{{ torneo.fecha_inicio|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="label">Fin:</span>
+                            <span>{{ torneo.fecha_fin|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        
+                        {% if torneo.puntos_minimos_ganar %}
+                        <div class="info-item">
+                            <span class="label">Puntos mínimos:</span>
+                            <span>{{ torneo.puntos_minimos_ganar }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="torneo-footer">
+                    <a href="{% url 'arena:arena_torneo' torneo.id %}" class="btn btn-primary">
+                        {% if torneo.estado == 'inscripcion' %}
+                            Inscribirse
+                        {% else %}
+                            Entrar al Arena
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🏆</div>
+            <h3>No hay torneos disponibles</h3>
+            <p>Por el momento no hay torneos activos. Vuelve pronto para participar.</p>
+            <a href="{% url 'dashboards:dashboard' %}" class="btn btn-secondary">Volver al Dashboard</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

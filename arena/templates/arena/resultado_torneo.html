@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resultados - {{ torneo.nombre }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'arena/css/resultados.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="resultados-container">
+    <div class="resultados-header">
+        <h1>🏆 Resultados del Torneo</h1>
+        <h2>{{ torneo.nombre }}</h2>
+        <p>{{ tributo_info.personaje.get_full_name }} - Distrito {{ tributo_info.distrito }}</p>
+    </div>
+
+    <!-- Resumen general -->
+    <div class="resumen-general">
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ total_puntos }}</span>
+                <span class="stat-label">Puntos Totales</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ retos_completados }}</span>
+                <span class="stat-label">/ {{ total_retos }} Retos Completados</span>
+            </div>
+        </div>
+        
+        {% if ranking_distrito %}
+        <div class="stat-card">
+            <div class="stat-icon">🏛️</div>
+            <div class="stat-info">
+                <span class="stat-value">{{ ranking_distrito.puntos_totales }}</span>
+                <span class="stat-label">Puntos del Distrito {{ tributo_info.distrito }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Detalle por reto -->
+    <div class="detalle-retos">
+        <h3>📊 Detalle por Reto</h3>
+        <div class="retos-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reto</th>
+                        <th>Dificultad</th>
+                        <th>Estado</th>
+                        <th>Casos Pasados</th>
+                        <th>Intentos</th>
+                        <th>Puntos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participacion in participaciones %}
+                    <tr class="estado-{{ participacion.estado }}">
+                        <td>
+                            <strong>{{ participacion.reto.titulo }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge dificultad-{{ participacion.reto.dificultad }}">
+                                {{ participacion.reto.get_dificultad_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if participacion.estado == 'completado' %}
+                                <span class="badge badge-success">✅ Completado</span>
+                            {% elif participacion.estado == 'en_progreso' %}
+                                <span class="badge badge-warning">⏳ En Progreso</span>
+                            {% elif participacion.estado == 'fallido' %}
+                                <span class="badge badge-danger">❌ Fallido</span>
+                            {% else %}
+                                <span class="badge badge-secondary">● Sin Iniciar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if participacion.casos_totales %}
+                                {{ participacion.casos_pasados }}/{{ participacion.casos_totales }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ participacion.numero_intento|default:"-" }}</td>
+                        <td class="puntos-cell">
+                            <strong>{{ participacion.puntos_obtenidos|default:"0" }}</strong>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="5"><strong>Total</strong></td>
+                        <td class="puntos-cell"><strong>{{ total_puntos }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Ranking del Distrito -->
+    {% if ranking_distrito %}
+    <div class="ranking-distrito">
+        <h3>🏛️ Ranking del Distrito {{ tributo_info.distrito }}</h3>
+        <div class="ranking-card">
+            <div class="ranking-item">
+                <span class="label">Puntos Totales:</span>
+                <span class="value">{{ ranking_distrito.puntos_totales }}</span>
+            </div>
+            <div class="ranking-item">
+                <span class="label">Retos Completados:</span>
+                <span class="value">{{ ranking_distrito.retos_completados }}</span>
+            </div>
+            <div class="ranking-item">
+                <span class="label">Tributos Activos:</span>
+                <span class="value">{{ ranking_distrito.tributos_activos }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mensaje final -->
+    <div class="mensaje-final">
+        {% if retos_completados == total_retos %}
+            <h3>🎉 ¡Felicitaciones!</h3>
+            <p>Has completado todos los retos del torneo. ¡Excelente trabajo!</p>
+        {% elif retos_completados > 0 %}
+            <h3>💪 ¡Buen esfuerzo!</h3>
+            <p>Has completado {{ retos_completados }} de {{ total_retos }} retos. Sigue practicando para mejorar en el próximo torneo.</p>
+        {% else %}
+            <h3>🎯 Sigue intentando</h3>
+            <p>El camino del programador está lleno de desafíos. ¡No te rindas!</p>
+        {% endif %}
+    </div>
+
+    <!-- Acciones -->
+    <div class="acciones-finales">
+        <a href="{% url 'arena:torneos_disponibles' %}" class="btn btn-primary btn-lg">
+            🏆 Ver Otros Torneos
+        </a>
+        <a href="{% url 'dashboards:dashboard' %}" class="btn btn-secondary btn-lg">
+            🏠 Volver al Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

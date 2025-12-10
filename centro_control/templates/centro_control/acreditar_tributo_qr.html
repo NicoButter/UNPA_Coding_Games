@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Acreditar Tributos - UNPA Coding Games{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'centro_control/css/acreditacion_styles.css' %}">
+<style>
+    .acreditacion-qr-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 2rem;
+    }
+    
+    .acreditacion-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .acreditacion-header h1 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .scanner-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .video-container {
+        position: relative;
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+        max-width: 640px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    #video {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    
+    .scanning-frame {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        border: 3px solid #27ae60;
+        border-radius: 8px;
+        box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.3);
+        pointer-events: none;
+    }
+    
+    .scanning-frame::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #27ae60;
+        animation: scanLine 2s linear infinite;
+    }
+    
+    @keyframes scanLine {
+        0%, 100% { top: 0; }
+        50% { top: calc(100% - 3px); }
+    }
+    
+    .status-display {
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+    
+    .status-ready {
+        background: #ecf0f1;
+        color: #7f8c8d;
+    }
+    
+    .status-scanning {
+        background: #3498db;
+        color: white;
+        animation: pulse 1.5s infinite;
+    }
+    
+    .status-success {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .status-warning {
+        background: #f39c12;
+        color: white;
+    }
+    
+    .status-error {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+    
+    .tributo-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        display: none;
+    }
+    
+    .tributo-info.show {
+        display: block;
+        animation: fadeIn 0.5s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tributo-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .detail-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 6px;
+        border-left: 4px solid #3498db;
+    }
+    
+    .detail-label {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #3498db;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-top: 0.5rem;
+    }
+    
+    canvas {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="acreditacion-qr-container">
+    <div class="acreditacion-header">
+        <h1>👁️ Sistema de Acreditación</h1>
+        <p>Escanea el código QR del gafete del tributo</p>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="acreditados-hoy">0</div>
+            <div class="stat-label">Acreditados Hoy</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="pendientes">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="total-registrados">0</div>
+            <div class="stat-label">Total Registrados</div>
+        </div>
+    </div>
+    
+    <div class="scanner-box">
+        <div class="video-container">
+            <video id="video" playsinline></video>
+            <div class="scanning-frame"></div>
+        </div>
+        
+        <div id="status" class="status-display status-ready">
+            📷 Iniciando escáner...
+        </div>
+        
+        <div id="tributo-info" class="tributo-info">
+            <h3 id="tributo-nombre"></h3>
+            <div class="tributo-details" id="tributo-details">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<canvas id="canvas" hidden></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const statusDisplay = document.getElementById('status');
+    const tributoInfo = document.getElementById('tributo-info');
+    const ctx = canvas.getContext('2d');
+    
+    let scanning = true;
+    let lastScanTime = 0;
+    
+    // Iniciar cámara
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }
+            });
+            
+            video.srcObject = stream;
+            video.setAttribute('playsinline', true);
+            video.play();
+            
+            updateStatus('📸 Listo para escanear', 'scanning');
+            requestAnimationFrame(tick);
+            
+        } catch (err) {
+            console.error('Error al acceder a la cámara:', err);
+            updateStatus('❌ Error al acceder a la cámara', 'error');
+        }
+    }
+    
+    function tick() {
+        if (!scanning) return;
+        
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            
+            if (code) {
+                const now = Date.now();
+                if (now - lastScanTime > 2000) {
+                    lastScanTime = now;
+                    handleQRCode(code.data);
+                }
+            }
+        }
+        
+        requestAnimationFrame(tick);
+    }
+    
+    async function handleQRCode(qrData) {
+        console.log('QR detectado:', qrData);
+        
+        let qrToken = qrData;
+        if (qrData.includes('://')) {
+            const url = new URL(qrData);
+            qrToken = url.pathname.split('/').pop() || qrData;
+        }
+        
+        updateStatus('🔄 Procesando...', 'scanning');
+        scanning = false;
+        
+        try {
+            const response = await fetch('{% url "acreditar_tributo_qr" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: `qr_token=${encodeURIComponent(qrToken)}`
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                updateStatus(`✅ ${data.mensaje}`, 'success');
+                mostrarInfoTributo(data.tributo);
+                
+                // Volver a escanear después de 5 segundos
+                setTimeout(() => {
+                    ocultarInfoTributo();
+                    scanning = true;
+                    updateStatus('📸 Listo para escanear', 'scanning');
+                    requestAnimationFrame(tick);
+                }, 5000);
+                
+            } else if (data.warning) {
+                updateStatus(`⚠️ ${data.mensaje}`, 'warning');
+                mostrarInfoTributo(data.tributo);
+                
+                setTimeout(() => {
+                    ocultarInfoTributo();
+                    scanning = true;
+                    updateStatus('📸 Listo para escanear', 'scanning');
+                    requestAnimationFrame(tick);
+                }, 4000);
+                
+            } else {
+                updateStatus(`❌ ${data.error}`, 'error');
+                
+                setTimeout(() => {
+                    scanning = true;
+                    updateStatus('📸 Listo para escanear', 'scanning');
+                    requestAnimationFrame(tick);
+                }, 3000);
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            updateStatus('❌ Error de conexión', 'error');
+            
+            setTimeout(() => {
+                scanning = true;
+                updateStatus('📸 Listo para escanear', 'scanning');
+                requestAnimationFrame(tick);
+            }, 3000);
+        }
+    }
+    
+    function updateStatus(message, type) {
+        statusDisplay.textContent = message;
+        statusDisplay.className = `status-display status-${type}`;
+    }
+    
+    function mostrarInfoTributo(tributo) {
+        document.getElementById('tributo-nombre').textContent = tributo.nombre;
+        
+        const details = `
+            <div class="detail-item">
+                <div class="detail-label">Código</div>
+                <div class="detail-value">${tributo.codigo}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Distrito</div>
+                <div class="detail-value">${tributo.distrito}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Nivel</div>
+                <div class="detail-value">${tributo.nivel || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Estado</div>
+                <div class="detail-value">${tributo.estado}</div>
+            </div>
+        `;
+        
+        document.getElementById('tributo-details').innerHTML = details;
+        tributoInfo.classList.add('show');
+    }
+    
+    function ocultarInfoTributo() {
+        tributoInfo.classList.remove('show');
+    }
+    
+    // Iniciar
+    window.addEventListener('load', startCamera);
+    
+    // Detener cámara al salir
+    window.addEventListener('beforeunload', () => {
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+    });
+</script>
+{% endblock %}

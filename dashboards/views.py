@@ -1,8 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
+from django.contrib import messages
 from django.db.models import Count, Q
 from capitol.models import TributoInfo, Personaje
+from arena.models import AyudaMentor, Torneo
+from .forms import AsignarMentorForm, AsignarVigilantesForm, AsignarTributoMentorForm, EnviarAyudaForm
 
 
 @login_required
@@ -32,16 +35,32 @@ def tributo_dashboard(request):
     except TributoInfo.DoesNotExist:
         tributo_info = None
     
+    # Ayudas recibidas del mentor (no leídas)
+    ayudas_pendientes = []
+    ayudas_recientes = []
+    if tributo_info:
+        ayudas_pendientes = AyudaMentor.objects.filter(
+            tributo=tributo_info,
+            leida=False
+        ).order_by('-fecha_envio')[:5]
+        
+        ayudas_recientes = AyudaMentor.objects.filter(
+            tributo=tributo_info,
+            leida=True
+        ).order_by('-fecha_lectura')[:3]
+    
     tributo_actions = [
-        {'title': 'Mi Perfil', 'url': '/perfil/', 'icon': '👤'},
-        {'title': 'Arena de Entrenamiento', 'url': '#', 'icon': '🎮'},
-        {'title': 'Ver Competencias', 'url': '#', 'icon': '🏆'},
-        {'title': 'Mis Estadísticas', 'url': '#', 'icon': '📊'},
+        {'title': 'Mi Gafete', 'url': '/gafete/ver/', 'icon': '🎫'},
+        {'title': 'Torneos Disponibles', 'url': '/arena/torneos/', 'icon': '🏆'},
+        {'title': 'Mensajes de mi Mentor', 'url': '/tributo/ayudas/', 'icon': '💬'},
+        {'title': 'Descargar Gafete PDF', 'url': '/gafete/descargar/', 'icon': '📄'},
     ]
     
     context = {
         'tributo_info': tributo_info,
         'tributo_actions': tributo_actions,
+        'ayudas_pendientes': ayudas_pendientes,
+        'ayudas_recientes': ayudas_recientes,
     }
     return render(request, 'dashboards/tributo_dashboard.html', context)
 
@@ -74,9 +93,9 @@ def vigilante_dashboard(request):
         })
     
     vigilante_actions = [
-        {'title': 'Acreditar Tributo', 'url': '/admin/capitol/tributoinfo/', 'icon': '✓'},
+        {'title': 'Escanear QR para Acreditar', 'url': '/acreditar/qr/', 'icon': '📷'},
         {'title': 'Ver Todos los Tributos', 'url': '/admin/capitol/tributoinfo/', 'icon': '👥'},
-        {'title': 'Escanear QR', 'url': '#', 'icon': '📷'},
+        {'title': 'Terminal de Login (Webcam)', 'url': '/login/webcam/', 'icon': '🎮'},
         {'title': 'Generar Reporte', 'url': '#', 'icon': '📄'},
     ]
     
@@ -98,29 +117,38 @@ def vigilante_dashboard(request):
 
 def mentor_dashboard(request):
     """Dashboard para mentores"""
-    # Por ahora, datos de ejemplo. Luego se conectará con el sistema de asignación
+    # Tributos asignados a este mentor
     mis_tributos = TributoInfo.objects.filter(
-        estado__in=['acreditado', 'activo']
-    ).select_related('personaje')[:6]
+        mentor=request.user
+    ).select_related('personaje').order_by('-fecha_registro')
     
+    # Estadísticas del mentor
     stats = {
         'mis_tributos': mis_tributos.count(),
-        'en_competencia': TributoInfo.objects.filter(estado='activo').count(),
-        'victorias': 0,  # Implementar cuando exista sistema de competencias
-        'distrito': request.user.tributo_info.distrito if hasattr(request.user, 'tributo_info') else 12,
+        'acreditados': mis_tributos.filter(estado='acreditado').count(),
+        'en_competencia': mis_tributos.filter(estado='activo').count(),
+        'ganadores': mis_tributos.filter(estado='ganador').count(),
+        'unidad_academica': request.user.unidad_academica or 'No asignada',
+        'distrito': request.user.distrito_asignado or 'No asignado',
     }
     
+    # Ayudas enviadas recientemente
+    ayudas_enviadas = AyudaMentor.objects.filter(
+        mentor=request.user
+    ).select_related('tributo__personaje').order_by('-fecha_envio')[:10]
+    
     mentor_actions = [
-        {'title': 'Mis Tributos', 'url': '#', 'icon': '👥'},
-        {'title': 'Crear Entrenamiento', 'url': '#', 'icon': '📝'},
-        {'title': 'Revisar Progresos', 'url': '#', 'icon': '📊'},
-        {'title': 'Mensajes', 'url': '#', 'icon': '💬'},
+        {'title': 'Mis Tributos', 'url': '/mentor/tributos/', 'icon': '👥'},
+        {'title': 'Enviar Ayuda/Pista', 'url': '/mentor/enviar-ayuda/', 'icon': '💡'},
+        {'title': 'Revisar Progresos', 'url': '/mentor/progresos/', 'icon': '📊'},
+        {'title': 'Historial de Ayudas', 'url': '/mentor/historial-ayudas/', 'icon': '📜'},
     ]
     
     context = {
         'mis_tributos': mis_tributos,
         'stats': stats,
         'mentor_actions': mentor_actions,
+        'ayudas_enviadas': ayudas_enviadas,
     }
     return render(request, 'dashboards/mentor_dashboard.html', context)
 
@@ -128,40 +156,172 @@ def mentor_dashboard(request):
 def jefe_capitolio_dashboard(request):
     """Dashboard para el jefe del Capitolio"""
     tributos = TributoInfo.objects.all()
+    torneos = Torneo.objects.all()
     
     stats = {
         'total_tributos': tributos.count(),
-        'competencias_activas': 0,  # Implementar cuando exista modelo de competencias
+        'torneos_activos': torneos.filter(estado__in=['inscripcion', 'en_curso']).count(),
         'total_mentores': Personaje.objects.filter(rol='mentor').count(),
         'total_vigilantes': Personaje.objects.filter(rol='vigilante').count(),
+        'mentores_sin_asignar': Personaje.objects.filter(rol='mentor', unidad_academica__isnull=True).count(),
+        'tributos_sin_mentor': tributos.filter(mentor__isnull=True).count(),
         'nuevos_registros': tributos.filter(fecha_registro__gte='2025-12-01').count(),
-        'tasa_participacion': 85,  # Calcularlo dinámicamente
-        'competencias_completadas': 0,
     }
     
     # Detalles por distrito
     distritos_detalle = []
     for i in range(1, 14):
         distrito_tributos = tributos.filter(distrito=i)
+        mentor_distrito = Personaje.objects.filter(rol='mentor', distrito_asignado=i).first()
         distritos_detalle.append({
             'numero': i,
             'total': distrito_tributos.count(),
+            'mentor': mentor_distrito.get_full_name() if mentor_distrito else 'Sin asignar',
             'unpa': distrito_tributos.filter(tipo='alumno_unpa').count(),
             'externos': distrito_tributos.filter(tipo='externo').count(),
             'acreditados': distrito_tributos.filter(estado='acreditado').count(),
             'activos': distrito_tributos.filter(estado='activo').count(),
         })
     
+    # Torneos recientes
+    torneos_recientes = torneos.order_by('-fecha_creacion')[:5]
+    
     jefe_actions = [
-        {'title': 'Panel Admin', 'url': '/admin/', 'icon': '⚙️'},
-        {'title': 'Nueva Competencia', 'url': '#', 'icon': '➕'},
+        {'title': 'Asignar Mentores', 'url': '/jefe/asignar-mentores/', 'icon': '🎯'},
+        {'title': 'Asignar Vigilantes', 'url': '/jefe/asignar-vigilantes/', 'icon': '👮'},
+        {'title': 'Crear Torneo', 'url': '/admin/arena/torneo/add/', 'icon': '➕'},
+        {'title': 'Panel Admin Completo', 'url': '/admin/', 'icon': '⚙️'},
         {'title': 'Gestionar Usuarios', 'url': '/admin/capitol/personaje/', 'icon': '👥'},
-        {'title': 'Reportes Completos', 'url': '#', 'icon': '📊'},
+        {'title': 'Reportes Completos', 'url': '/jefe/reportes/', 'icon': '📊'},
     ]
     
     context = {
         'stats': stats,
         'distritos_detalle': distritos_detalle,
         'jefe_actions': jefe_actions,
+        'torneos_recientes': torneos_recientes,
     }
     return render(request, 'dashboards/jefe_capitolio_dashboard.html', context)
+
+
+# ============= VISTAS PARA JEFE DEL CAPITOLIO =============
+
+@login_required
+def asignar_mentores_view(request):
+    """Vista para que el Jefe del Capitolio asigne mentores a distritos"""
+    if request.user.rol != 'jefe_capitolio':
+        return HttpResponseForbidden("Solo el Jefe del Capitolio puede asignar mentores")
+    
+    mentores = Personaje.objects.filter(rol='mentor').order_by('distrito_asignado', 'username')
+    
+    if request.method == 'POST':
+        mentor_id = request.POST.get('mentor_id')
+        mentor = get_object_or_404(Personaje, id=mentor_id, rol='mentor')
+        form = AsignarMentorForm(request.POST, instance=mentor)
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Mentor {mentor.get_full_name()} asignado exitosamente')
+            return redirect('dashboards:asignar_mentores')
+    
+    context = {
+        'mentores': mentores,
+        'form': AsignarMentorForm(),
+    }
+    return render(request, 'dashboards/asignar_mentores.html', context)
+
+
+@login_required
+def asignar_vigilantes_view(request):
+    """Vista para que el Jefe del Capitolio asigne vigilantes a torneos"""
+    if request.user.rol != 'jefe_capitolio':
+        return HttpResponseForbidden("Solo el Jefe del Capitolio puede asignar vigilantes")
+    
+    torneos = Torneo.objects.all().prefetch_related('vigilantes_asignados').order_by('-fecha_inicio')
+    vigilantes = Personaje.objects.filter(rol='vigilante').order_by('username')
+    
+    if request.method == 'POST':
+        torneo_id = request.POST.get('torneo_id')
+        torneo = get_object_or_404(Torneo, id=torneo_id)
+        vigilantes_ids = request.POST.getlist('vigilantes')
+        
+        torneo.vigilantes_asignados.set(vigilantes_ids)
+        messages.success(request, f'Vigilantes asignados al torneo {torneo.nombre}')
+        return redirect('dashboards:asignar_vigilantes')
+    
+    context = {
+        'torneos': torneos,
+        'vigilantes': vigilantes,
+    }
+    return render(request, 'dashboards/asignar_vigilantes.html', context)
+
+
+# ============= VISTAS PARA MENTORES =============
+
+@login_required
+def enviar_ayuda_view(request):
+    """Vista para que el mentor envíe ayudas a sus tributos"""
+    if request.user.rol != 'mentor':
+        return HttpResponseForbidden("Solo los mentores pueden enviar ayudas")
+    
+    if request.method == 'POST':
+        form = EnviarAyudaForm(request.POST, mentor=request.user)
+        
+        if form.is_valid():
+            ayuda = form.save(commit=False)
+            ayuda.mentor = request.user
+            ayuda.save()
+            messages.success(request, f'Ayuda enviada a {ayuda.tributo.personaje.get_full_name()}')
+            return redirect('dashboards:dashboard')
+    else:
+        form = EnviarAyudaForm(mentor=request.user)
+    
+    context = {
+        'form': form,
+        'mis_tributos': TributoInfo.objects.filter(mentor=request.user),
+    }
+    return render(request, 'dashboards/enviar_ayuda.html', context)
+
+
+@login_required
+def mis_tributos_view(request):
+    """Vista para que el mentor vea sus tributos asignados"""
+    if request.user.rol != 'mentor':
+        return HttpResponseForbidden("Solo los mentores pueden ver esta página")
+    
+    tributos = TributoInfo.objects.filter(
+        mentor=request.user
+    ).select_related('personaje').order_by('-fecha_registro')
+    
+    context = {
+        'tributos': tributos,
+    }
+    return render(request, 'dashboards/mis_tributos.html', context)
+
+
+# ============= VISTAS PARA TRIBUTOS =============
+
+@login_required
+def ver_ayudas_view(request):
+    """Vista para que el tributo vea las ayudas de su mentor"""
+    try:
+        tributo_info = request.user.tributo_info
+    except TributoInfo.DoesNotExist:
+        messages.error(request, 'No tienes información de tributo')
+        return redirect('dashboards:dashboard')
+    
+    # Marcar ayudas como leídas si se accede con parámetro
+    ayuda_id = request.GET.get('marcar_leida')
+    if ayuda_id:
+        ayuda = get_object_or_404(AyudaMentor, id=ayuda_id, tributo=tributo_info)
+        ayuda.marcar_como_leida()
+    
+    ayudas = AyudaMentor.objects.filter(
+        tributo=tributo_info
+    ).select_related('mentor', 'reto').order_by('-fecha_envio')
+    
+    context = {
+        'ayudas': ayudas,
+        'ayudas_pendientes': ayudas.filter(leida=False).count(),
+    }
+    return render(request, 'dashboards/ver_ayudas.html', context)

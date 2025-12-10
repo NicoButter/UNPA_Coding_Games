@@ -199,6 +199,9 @@ Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detall
 
 ## Contacto
 
+**Nicolas Butterfield**  
+📧 nicobutter@gmail.com
+
 **Universidad Nacional de la Patagonia Austral (UNPA)**
 
 Desarrollado para fomentar la práctica de programación entre estudiantes de la UNPA.

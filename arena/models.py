@@ -38,6 +38,16 @@ class Torneo(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
+    # Vigilantes asignados (Peacekeepers del torneo)
+    vigilantes_asignados = models.ManyToManyField(
+        Personaje,
+        blank=True,
+        related_name='torneos_vigilados',
+        limit_choices_to={'rol': 'vigilante'},
+        verbose_name='Vigilantes Asignados',
+        help_text='Vigilantes (Peacekeepers) que supervisan este torneo'
+    )
+    
     # Imagen del torneo
     imagen = models.ImageField(upload_to='torneos/', blank=True, null=True)
     
@@ -271,3 +281,70 @@ class RankingDistrito(models.Model):
     
     def __str__(self):
         return f"Distrito {self.distrito} - {self.puntos_totales} pts ({self.torneo.nombre})"
+
+
+class AyudaMentor(models.Model):
+    """
+    Sistema de patrocinio: Ayudas que el mentor envía a sus tributos durante la competencia.
+    Inspirado en los 'regalos de patrocinadores' de Hunger Games.
+    """
+    TIPO_AYUDA_CHOICES = [
+        ('pista', '💡 Pista'),
+        ('ejemplo', '📝 Ejemplo de Código'),
+        ('recurso', '📚 Recurso de Aprendizaje'),
+        ('motivacion', '💪 Mensaje de Motivación'),
+        ('advertencia', '⚠️ Advertencia/Alerta'),
+    ]
+    
+    # Relaciones
+    mentor = models.ForeignKey(
+        Personaje,
+        on_delete=models.CASCADE,
+        related_name='ayudas_enviadas',
+        limit_choices_to={'rol': 'mentor'}
+    )
+    tributo = models.ForeignKey(
+        TributoInfo,
+        on_delete=models.CASCADE,
+        related_name='ayudas_recibidas',
+        verbose_name='Tributo Destinatario'
+    )
+    reto = models.ForeignKey(
+        'Reto',
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name='ayudas_relacionadas',
+        help_text='Reto específico al que se refiere la ayuda (opcional)'
+    )
+    
+    # Contenido de la ayuda
+    tipo = models.CharField(max_length=20, choices=TIPO_AYUDA_CHOICES, default='pista')
+    titulo = models.CharField(max_length=200, verbose_name='Título de la Ayuda')
+    contenido = models.TextField(verbose_name='Contenido de la Ayuda')
+    
+    # Metadata
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+    leida = models.BooleanField(default=False, verbose_name='¿Leída por el tributo?')
+    fecha_lectura = models.DateTimeField(blank=True, null=True)
+    
+    # Costo (opcional - para gamificación futura)
+    costo_puntos = models.IntegerField(
+        default=0,
+        help_text='Puntos que costó enviar esta ayuda (para sistema de patrocinio)'
+    )
+    
+    class Meta:
+        verbose_name = 'Ayuda de Mentor'
+        verbose_name_plural = 'Ayudas de Mentores'
+        ordering = ['-fecha_envio']
+    
+    def __str__(self):
+        return f"{self.get_tipo_display()} de {self.mentor.get_full_name()} para {self.tributo.personaje.get_full_name()}"
+    
+    def marcar_como_leida(self):
+        """Marca la ayuda como leída y registra la fecha"""
+        if not self.leida:
+            self.leida = True
+            self.fecha_lectura = timezone.now()
+            self.save()

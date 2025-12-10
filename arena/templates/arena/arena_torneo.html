@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load arena_filters %}
+
+{% block title %}{{ torneo.nombre }} - Arena{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'arena/css/arena.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="arena-container">
+    <!-- Header con información del torneo y timer -->
+    <div class="arena-header">
+        <div class="header-info">
+            <h1>🎮 {{ torneo.nombre }}</h1>
+            <p class="distrito-info">Distrito {{ tributo_info.distrito }} - {{ tributo_info.personaje.get_full_name }}</p>
+        </div>
+        
+        <div class="arena-stats">
+            <div class="stat-box">
+                <span class="stat-value">{{ completados }}</span>
+                <span class="stat-label">/ {{ total_retos }} Completados</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">{{ puntos_totales }}</span>
+                <span class="stat-label">Puntos</span>
+            </div>
+            {% if tiempo_restante %}
+            <div class="stat-box timer-box">
+                <span class="stat-value" id="timer">--:--:--</span>
+                <span class="stat-label">Tiempo Restante</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Grid de retos -->
+    <div class="retos-grid">
+        {% for reto in retos %}
+        {% with participacion=participaciones|get_item:reto.id %}
+        <div class="reto-card estado-{{ participacion.estado }}">
+            <div class="reto-header">
+                <div class="reto-dificultad dificultad-{{ reto.dificultad }}">
+                    {% if reto.dificultad == 'novato' %}⭐
+                    {% elif reto.dificultad == 'intermedio' %}⭐⭐
+                    {% elif reto.dificultad == 'avanzado' %}⭐⭐⭐
+                    {% elif reto.dificultad == 'experto' %}⭐⭐⭐⭐⭐
+                    {% endif %}
+                </div>
+                <div class="reto-estado-badge">
+                    {% if participacion.estado == 'completado' %}
+                        <span class="badge badge-success">✅ Completado</span>
+                    {% elif participacion.estado == 'en_progreso' %}
+                        <span class="badge badge-warning">⏳ En Progreso</span>
+                    {% elif participacion.estado == 'fallido' %}
+                        <span class="badge badge-danger">❌ Fallido</span>
+                    {% else %}
+                        <span class="badge badge-secondary">● Sin Iniciar</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="reto-body">
+                <h3>{{ reto.titulo }}</h3>
+                <p class="reto-descripcion">{{ reto.descripcion|truncatewords:15 }}</p>
+                
+                <div class="reto-info">
+                    <div class="info-row">
+                        <span>💰 Puntos Base:</span>
+                        <strong>{{ reto.puntos_base }}</strong>
+                    </div>
+                    {% if reto.puntos_bonus %}
+                    <div class="info-row">
+                        <span>🎁 Bonus (1er intento):</span>
+                        <strong>+{{ reto.puntos_bonus }}</strong>
+                    </div>
+                    {% endif %}
+                    <div class="info-row">
+                        <span>📊 Tipo:</span>
+                        <strong>{{ reto.get_tipo_display }}</strong>
+                    </div>
+                    {% if participacion.numero_intento %}
+                    <div class="info-row">
+                        <span>🔄 Intentos:</span>
+                        <strong>{{ participacion.numero_intento }}</strong>
+                    </div>
+                    {% endif %}
+                    {% if participacion.casos_pasados is not None %}
+                    <div class="info-row">
+                        <span>✓ Casos Pasados:</span>
+                        <strong>{{ participacion.casos_pasados }}/{{ participacion.casos_totales }}</strong>
+                    </div>
+                    {% endif %}
+                    {% if participacion.puntos_obtenidos %}
+                    <div class="info-row puntos-obtenidos">
+                        <span>⭐ Puntos Obtenidos:</span>
+                        <strong>{{ participacion.puntos_obtenidos }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="reto-footer">
+                <a href="{% url 'arena:resolver_reto' reto.id %}" class="btn {% if participacion.estado == 'completado' %}btn-success{% else %}btn-primary{% endif %}">
+                    {% if participacion.estado == 'completado' %}
+                        Ver Solución
+                    {% elif participacion.estado == 'en_progreso' %}
+                        Continuar
+                    {% else %}
+                        Resolver
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+        {% endwith %}
+        {% endfor %}
+    </div>
+
+    <!-- Botón de finalización -->
+    <div class="arena-actions">
+        <form method="post" action="{% url 'arena:finalizar_participacion' torneo.id %}" onsubmit="return confirm('¿Estás seguro de finalizar tu participación? No podrás continuar después.');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-lg">
+                🏁 Finalizar Participación
+            </button>
+        </form>
+        <a href="{% url 'arena:torneos_disponibles' %}" class="btn btn-secondary btn-lg">
+            ← Volver a Torneos
+        </a>
+    </div>
+</div>
+
+{% if tiempo_restante %}
+<script>
+    // Timer countdown
+    let tiempoRestante = {{ tiempo_restante|default:"0" }};
+    const timerElement = document.getElementById('timer');
+    
+    function actualizarTimer() {
+        if (tiempoRestante <= 0) {
+            // Tiempo agotado - finalizar automáticamente
+            alert('El tiempo del torneo ha finalizado');
+            document.querySelector('form[action*="finalizar"]').submit();
+            return;
+        }
+        
+        const horas = Math.floor(tiempoRestante / 3600);
+        const minutos = Math.floor((tiempoRestante % 3600) / 60);
+        const segundos = tiempoRestante % 60;
+        
+        timerElement.textContent = String(horas).padStart(2, '0') + ':' + String(minutos).padStart(2, '0') + ':' + String(segundos).padStart(2, '0');
+        
+        // Cambiar color si queda poco tiempo
+        if (tiempoRestante < 300) { // Menos de 5 minutos
+            timerElement.parentElement.classList.add('warning');
+        }
+        
+        tiempoRestante--;
+    }
+    
+    // Actualizar cada segundo
+    actualizarTimer();
+    setInterval(actualizarTimer, 1000);
+</script>
+{% endif %}
+
+<script>
+    // Template filter personalizado simulado en JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-refresh cada 30 segundos para actualizar estados
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+    });
+</script>
+{% endblock %}

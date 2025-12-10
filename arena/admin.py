@@ -1,14 +1,15 @@
 from django.contrib import admin
-from .models import Torneo, MentorDistrito, Reto, CasoDePrueba, ParticipacionTributo, RankingDistrito
+from .models import Torneo, MentorDistrito, Reto, CasoDePrueba, ParticipacionTributo, RankingDistrito, AyudaMentor
 
 
 @admin.register(Torneo)
 class TorneoAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'edicion', 'estado', 'fecha_inicio', 'fecha_fin', 'is_activo']
+    list_display = ['nombre', 'edicion', 'estado', 'fecha_inicio', 'fecha_fin', 'is_activo', 'get_vigilantes_count']
     list_filter = ['estado', 'is_activo', 'permite_equipos']
     search_fields = ['nombre', 'descripcion']
     date_hierarchy = 'fecha_inicio'
     readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    filter_horizontal = ['vigilantes_asignados']
     
     fieldsets = (
         ('Información Básica', {
@@ -20,11 +21,19 @@ class TorneoAdmin(admin.ModelAdmin):
         ('Estado y Configuración', {
             'fields': ('estado', 'is_activo', 'puntos_minimos_ganar', 'permite_equipos', 'puntuacion_por_distrito')
         }),
+        ('Personal Asignado', {
+            'fields': ('creado_por', 'vigilantes_asignados'),
+            'description': 'Asignar Vigilantes (Peacekeepers) para este torneo'
+        }),
         ('Meta Información', {
-            'fields': ('creado_por', 'fecha_creacion', 'fecha_actualizacion'),
+            'fields': ('fecha_creacion', 'fecha_actualizacion'),
             'classes': ('collapse',)
         }),
     )
+    
+    def get_vigilantes_count(self, obj):
+        return obj.vigilantes_asignados.count()
+    get_vigilantes_count.short_description = 'Vigilantes'
 
 
 @admin.register(MentorDistrito)
@@ -106,6 +115,42 @@ class ParticipacionTributoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(AyudaMentor)
+class AyudaMentorAdmin(admin.ModelAdmin):
+    """Admin para el sistema de ayudas/patrocinio de mentores"""
+    list_display = ['titulo', 'tipo', 'mentor', 'tributo', 'reto', 'fecha_envio', 'leida', 'fecha_lectura']
+    list_filter = ['tipo', 'leida', 'fecha_envio', 'mentor']
+    search_fields = ['titulo', 'contenido', 'tributo__personaje__first_name', 'tributo__personaje__last_name']
+    readonly_fields = ['fecha_envio', 'fecha_lectura']
+    date_hierarchy = 'fecha_envio'
+    
+    fieldsets = (
+        ('Información de la Ayuda', {
+            'fields': ('tipo', 'titulo', 'contenido')
+        }),
+        ('Destinatarios', {
+            'fields': ('mentor', 'tributo', 'reto')
+        }),
+        ('Estado', {
+            'fields': ('leida', 'fecha_envio', 'fecha_lectura', 'costo_puntos')
+        }),
+    )
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Si es un mentor, solo ve sus propias ayudas
+        if request.user.rol == 'mentor':
+            return qs.filter(mentor=request.user)
+        return qs
+    
+    def save_model(self, request, obj, form, change):
+        # Si es un mentor creando una ayuda, asignarlo automáticamente
+        if not change and request.user.rol == 'mentor':
+            obj.mentor = request.user
+        super().save_model(request, obj, form, change)
+
 
 
 @admin.register(RankingDistrito)
