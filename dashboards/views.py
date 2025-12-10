@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.db.models import Count, Q
+from django.utils import timezone
 from capitol.models import TributoInfo, Personaje
 from arena.models import AyudaMentor, Torneo
 from .forms import AsignarMentorForm, AsignarVigilantesForm, AsignarTributoMentorForm, EnviarAyudaForm
@@ -94,6 +95,7 @@ def vigilante_dashboard(request):
     
     vigilante_actions = [
         {'title': 'Escanear QR para Acreditar', 'url': '/acreditar/qr/', 'icon': '📷'},
+        {'title': 'Panel de Monitoreo en Vivo', 'url': '/vigilante/monitoreo/', 'icon': '📺'},
         {'title': 'Ver Todos los Tributos', 'url': '/admin/capitol/tributoinfo/', 'icon': '👥'},
         {'title': 'Terminal de Login (Webcam)', 'url': '/login/webcam/', 'icon': '🎮'},
         {'title': 'Generar Reporte', 'url': '#', 'icon': '📄'},
@@ -122,6 +124,16 @@ def mentor_dashboard(request):
         mentor=request.user
     ).select_related('personaje').order_by('-fecha_registro')
     
+    # Obtener o crear presupuesto
+    from arena.models import PresupuestoMentor
+    presupuesto, created = PresupuestoMentor.objects.get_or_create(
+        mentor=request.user,
+        defaults={
+            'puntos_totales': 1000,
+            'max_ayudas_por_dia': 10,
+        }
+    )
+    
     # Estadísticas del mentor
     stats = {
         'mis_tributos': mis_tributos.count(),
@@ -130,6 +142,7 @@ def mentor_dashboard(request):
         'ganadores': mis_tributos.filter(estado='ganador').count(),
         'unidad_academica': request.user.unidad_academica or 'No asignada',
         'distrito': request.user.distrito_asignado or 'No asignado',
+        'puntos_patrocinio': presupuesto.puntos_disponibles,
     }
     
     # Ayudas enviadas recientemente
@@ -149,6 +162,7 @@ def mentor_dashboard(request):
         'stats': stats,
         'mentor_actions': mentor_actions,
         'ayudas_enviadas': ayudas_enviadas,
+        'presupuesto': presupuesto,
     }
     return render(request, 'dashboards/mentor_dashboard.html', context)
 
@@ -264,21 +278,61 @@ def enviar_ayuda_view(request):
     if request.user.rol != 'mentor':
         return HttpResponseForbidden("Solo los mentores pueden enviar ayudas")
     
+    # Obtener o crear presupuesto del mentor
+    from arena.models import PresupuestoMentor, obtener_costo_ayuda
+    presupuesto, created = PresupuestoMentor.objects.get_or_create(
+        mentor=request.user,
+        defaults={
+            'puntos_totales': 1000,
+            'max_ayudas_por_dia': 10,
+        }
+    )
+    
     if request.method == 'POST':
         form = EnviarAyudaForm(request.POST, mentor=request.user)
         
         if form.is_valid():
-            ayuda = form.save(commit=False)
-            ayuda.mentor = request.user
-            ayuda.save()
-            messages.success(request, f'Ayuda enviada a {ayuda.tributo.personaje.get_full_name()}')
-            return redirect('dashboards:dashboard')
+            tipo_ayuda = form.cleaned_data['tipo']
+            costo = obtener_costo_ayuda(tipo_ayuda)
+            
+            # Verificar si puede enviar la ayuda
+            puede_enviar, mensaje = presupuesto.puede_enviar_ayuda(costo)
+            
+            if not puede_enviar:
+                messages.error(request, mensaje)
+            else:
+                ayuda = form.save(commit=False)
+                ayuda.mentor = request.user
+                ayuda.costo_puntos = costo
+                ayuda.save()
+                
+                # Gastar puntos
+                presupuesto.gastar_puntos(costo)
+                
+                messages.success(
+                    request, 
+                    f'Ayuda enviada a {ayuda.tributo.personaje.get_full_name()}. '
+                    f'Costo: {costo} pts. Puntos restantes: {presupuesto.puntos_disponibles}'
+                )
+                return redirect('dashboards:dashboard')
     else:
         form = EnviarAyudaForm(mentor=request.user)
+    
+    # Estadísticas de ayudas de hoy
+    hoy = timezone.now().date()
+    ayudas_hoy = AyudaMentor.objects.filter(
+        mentor=request.user,
+        fecha_envio__date=hoy
+    ).count()
+    
+    from arena.models import COSTOS_AYUDAS
     
     context = {
         'form': form,
         'mis_tributos': TributoInfo.objects.filter(mentor=request.user),
+        'presupuesto': presupuesto,
+        'ayudas_hoy': ayudas_hoy,
+        'costos_ayudas': COSTOS_AYUDAS,
     }
     return render(request, 'dashboards/enviar_ayuda.html', context)
 
@@ -325,3 +379,118 @@ def ver_ayudas_view(request):
         'ayudas_pendientes': ayudas.filter(leida=False).count(),
     }
     return render(request, 'dashboards/ver_ayudas.html', context)
+
+
+# ============= API PARA NOTIFICACIONES =============
+
+@login_required
+def check_notifications_api(request):
+    """API endpoint para verificar notificaciones en tiempo real"""
+    try:
+        tributo_info = request.user.tributo_info
+        ayudas_pendientes = AyudaMentor.objects.filter(
+            tributo=tributo_info,
+            leida=False
+        ).count()
+        
+        return JsonResponse({
+            'success': True,
+            'ayudas_pendientes': ayudas_pendientes,
+            'timestamp': timezone.now().isoformat()
+        })
+    except TributoInfo.DoesNotExist:
+        return JsonResponse({
+            'success': True,
+            'ayudas_pendientes': 0,
+            'timestamp': timezone.now().isoformat()
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+# ============= PANEL DE MONITOREO PARA VIGILANTES =============
+
+@login_required
+def panel_monitoreo_view(request):
+    """Panel de monitoreo en vivo para vigilantes"""
+    if request.user.rol != 'vigilante':
+        return HttpResponseForbidden("Solo los vigilantes pueden acceder al panel de monitoreo")
+    
+    return render(request, 'dashboards/panel_monitoreo.html')
+
+
+@login_required
+def monitor_tributos_api(request):
+    """API endpoint para obtener datos en tiempo real de tributos"""
+    if request.user.rol != 'vigilante':
+        return JsonResponse({'error': 'Acceso denegado'}, status=403)
+    
+    filter_type = request.GET.get('filter', 'all')
+    
+    # Obtener tributos según filtro
+    tributos = TributoInfo.objects.select_related('personaje').all()
+    
+    if filter_type != 'all':
+        tributos = tributos.filter(estado=filter_type)
+    
+    # Estadísticas generales
+    hoy = timezone.now().date()
+    from arena.models import ParticipacionTributo
+    
+    stats = {
+        'total': TributoInfo.objects.count(),
+        'activos': TributoInfo.objects.filter(estado='activo').count(),
+        'acreditados': TributoInfo.objects.filter(estado='acreditado').count(),
+        'completados_hoy': ParticipacionTributo.objects.filter(
+            fecha_completado__date=hoy,
+            estado='completado'
+        ).count(),
+    }
+    
+    # Datos de cada tributo
+    tributos_data = []
+    for tributo in tributos:
+        # Obtener participaciones
+        participaciones = ParticipacionTributo.objects.filter(tributo=tributo)
+        total_participaciones = participaciones.count()
+        completados = participaciones.filter(estado='completado').count()
+        puntos_totales = sum([p.puntos_obtenidos for p in participaciones if p.puntos_obtenidos])
+        
+        # Última actividad
+        ultima_participacion = participaciones.order_by('-fecha_envio').first()
+        if ultima_participacion:
+            tiempo_transcurrido = timezone.now() - ultima_participacion.fecha_envio
+            if tiempo_transcurrido.seconds < 60:
+                ultima_actividad = "Hace menos de 1 min"
+            elif tiempo_transcurrido.seconds < 3600:
+                ultima_actividad = f"Hace {tiempo_transcurrido.seconds // 60} min"
+            else:
+                ultima_actividad = f"Hace {tiempo_transcurrido.seconds // 3600}h"
+        else:
+            ultima_actividad = "Sin actividad"
+        
+        porcentaje = (completados / total_participaciones * 100) if total_participaciones > 0 else 0
+        
+        tributos_data.append({
+            'nombre': tributo.personaje.get_full_name(),
+            'codigo': tributo.codigo_tributo,
+            'distrito': tributo.distrito,
+            'estado': tributo.estado,
+            'estado_display': tributo.get_estado_display(),
+            'retos_completados': completados,
+            'total_retos': total_participaciones,
+            'porcentaje_completado': round(porcentaje, 1),
+            'puntos': puntos_totales,
+            'nivel': tributo.get_nivel_display(),
+            'ultima_actividad': ultima_actividad,
+        })
+    
+    return JsonResponse({
+        'success': True,
+        'stats': stats,
+        'tributos': tributos_data,
+        'timestamp': timezone.now().isoformat()
+    })

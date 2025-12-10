@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Enviar Ayuda - Mentor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container-enviar-ayuda {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #9B30FF 0%, #667eea 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #9B30FF;
+    }
+    
+    .tipo-ayuda-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .tipo-ayuda-option {
+        position: relative;
+    }
+    
+    .tipo-ayuda-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .tipo-ayuda-label {
+        display: block;
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .tipo-ayuda-option input[type="radio"]:checked + .tipo-ayuda-label {
+        background: #9B30FF;
+        color: white;
+        border-color: #9B30FF;
+        font-weight: bold;
+    }
+    
+    .tipo-ayuda-label:hover {
+        border-color: #9B30FF;
+        background: #f3e5ff;
+    }
+    
+    .tipo-icon {
+        font-size: 2em;
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .btn-enviar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 20px;
+    }
+    
+    .btn-enviar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .tributos-sidebar {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .tributo-item {
+        background: white;
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        border-left: 3px solid #9B30FF;
+    }
+    
+    .tributo-nombre {
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .tributo-info {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 3px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-enviar-ayuda">
+    <div class="page-header">
+        <h1>💡 Enviar Ayuda a tus Tributos</h1>
+        <p>Sistema de patrocinio - Apoya a tus tributos durante la competencia</p>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom: 20px;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if mis_tributos %}
+    <div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; padding: 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h3 style="margin: 0 0 15px 0; color: #333;">💰 Presupuesto de Patrocinio</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+            <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em; font-weight: bold;">{{ presupuesto.puntos_disponibles }}</div>
+                <div style="font-size: 0.9em;">Puntos Disponibles</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em; font-weight: bold;">{{ presupuesto.puntos_totales }}</div>
+                <div style="font-size: 0.9em;">Puntos Totales</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em; font-weight: bold;">{{ ayudas_hoy }}/{{ presupuesto.max_ayudas_por_dia }}</div>
+                <div style="font-size: 0.9em;">Ayudas Hoy</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em; font-weight: bold;">{{ presupuesto.total_ayudas_enviadas }}</div>
+                <div style="font-size: 0.9em;">Total Enviadas</div>
+            </div>
+        </div>
+        <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 5px;">
+            <strong>📊 Tabla de Costos:</strong>
+            {% for tipo, costo in costos_ayudas.items %}
+                <span style="display: inline-block; margin: 5px; padding: 5px 10px; background: white; border-radius: 5px; font-size: 0.9em;">
+                    {{ tipo }}: <strong>{{ costo }} pts</strong>
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="tributos-sidebar">
+        <h3 style="margin-bottom: 15px;">👥 Tus Tributos ({{ mis_tributos.count }})</h3>
+        {% for tributo in mis_tributos %}
+        <div class="tributo-item">
+            <div class="tributo-nombre">{{ tributo.personaje.get_full_name }}</div>
+            <div class="tributo-info">
+                📍 Distrito {{ tributo.distrito }} | 
+                {{ tributo.get_nivel_display }} | 
+                {{ tributo.get_estado_display }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="form-container">
+        <h2 style="margin-bottom: 25px;">✉️ Nueva Ayuda</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.tributo.id_for_label }}">Tributo Destinatario *</label>
+                {{ form.tributo }}
+                {% if form.tributo.errors %}
+                    <div style="color: red; margin-top: 5px;">{{ form.tributo.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label>Tipo de Ayuda * (cada tipo tiene un costo diferente)</label>
+                <div class="tipo-ayuda-grid">
+                    {% for value, label in form.tipo.field.choices %}
+                    <div class="tipo-ayuda-option">
+                        <input type="radio" name="tipo" value="{{ value }}" id="tipo_{{ value }}" 
+                               {% if form.tipo.value == value %}checked{% endif %} required>
+                        <label for="tipo_{{ value }}" class="tipo-ayuda-label">
+                            <span class="tipo-icon">{{ label|slice:":2" }}</span>
+                            <span>{{ label|slice:"3:" }}</span>
+                            <div style="font-size: 0.85em; margin-top: 5px; font-weight: bold; color: #FFD700;">
+                                {{ costos_ayudas|get_item:value|default:50 }} pts
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.titulo.id_for_label }}">Título de la Ayuda *</label>
+                {{ form.titulo }}
+                {% if form.titulo.errors %}
+                    <div style="color: red; margin-top: 5px;">{{ form.titulo.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.contenido.id_for_label }}">Contenido / Mensaje *</label>
+                {{ form.contenido }}
+                {% if form.contenido.errors %}
+                    <div style="color: red; margin-top: 5px;">{{ form.contenido.errors }}</div>
+                {% endif %}
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    💡 Escribe una pista útil, ejemplo de código, o mensaje motivacional para ayudar a tu tributo
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.reto.id_for_label }}">Reto Relacionado (Opcional)</label>
+                {{ form.reto }}
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    Selecciona un reto específico si la ayuda se refiere a él
+                </small>
+            </div>
+            
+            <button type="submit" class="btn-enviar">
+                📤 Enviar Ayuda
+            </button>
+        </form>
+    </div>
+    
+    {% else %}
+    <div class="form-container" style="text-align: center; padding: 60px;">
+        <div style="font-size: 3em; margin-bottom: 20px;">👥</div>
+        <h3>No tienes tributos asignados</h3>
+        <p style="color: #666; margin-top: 10px;">
+            Contacta al Jefe del Capitolio para que te asigne tributos
+        </p>
+    </div>
+    {% endif %}
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{% url 'dashboards:dashboard' %}" class="btn btn-secondary">← Volver al Dashboard</a>
+    </div>
+</div>
+
+{% load custom_filters %}
+<script>
+// Filtro personalizado para obtener valores del diccionario
+</script>
+{% endblock %}

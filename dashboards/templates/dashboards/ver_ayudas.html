@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ayudas de mi Mentor - Tributo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .ayudas-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .stats-banner {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-around;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #9B30FF;
+    }
+    
+    .stat-label {
+        color: #666;
+        margin-top: 5px;
+    }
+    
+    .ayuda-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-left: 5px solid #9B30FF;
+        transition: transform 0.3s;
+    }
+    
+    .ayuda-card.no-leida {
+        background: linear-gradient(to right, #fff8e1 0%, white 100%);
+        border-left-color: #FFD700;
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+    }
+    
+    .ayuda-card:hover {
+        transform: translateX(5px);
+    }
+    
+    .ayuda-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+    
+    .ayuda-tipo {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 0.9em;
+        margin-bottom: 10px;
+    }
+    
+    .tipo-pista { background: #e3f2fd; color: #1976d2; }
+    .tipo-ejemplo { background: #f3e5f5; color: #7b1fa2; }
+    .tipo-recurso { background: #e8f5e9; color: #388e3c; }
+    .tipo-motivacion { background: #fff3e0; color: #f57c00; }
+    .tipo-advertencia { background: #ffebee; color: #c62828; }
+    
+    .ayuda-titulo {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .ayuda-contenido {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        font-family: 'Courier New', monospace;
+    }
+    
+    .ayuda-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+        font-size: 0.9em;
+        color: #666;
+    }
+    
+    .mentor-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .mentor-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #9B30FF;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .badge-nuevo {
+        background: #FFD700;
+        color: #333;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+    
+    .reto-link {
+        background: #e8f5e9;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+        display: inline-block;
+    }
+    
+    .reto-link a {
+        color: #2e7d32;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    
+    .reto-link a:hover {
+        text-decoration: underline;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px;
+        background: white;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ayudas-container">
+    <div class="page-header">
+        <h1>💬 Mensajes de tu Mentor</h1>
+        <p>Ayudas y consejos para tu progreso en la arena</p>
+    </div>
+    
+    <div class="stats-banner">
+        <div class="stat-item">
+            <div class="stat-number">{{ ayudas.count }}</div>
+            <div class="stat-label">Total Ayudas</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ ayudas_pendientes }}</div>
+            <div class="stat-label">Sin Leer</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ ayudas.count|add:"-"|add:ayudas_pendientes|stringformat:"d" }}</div>
+            <div class="stat-label">Leídas</div>
+        </div>
+    </div>
+    
+    {% if ayudas %}
+        {% for ayuda in ayudas %}
+        <div class="ayuda-card {% if not ayuda.leida %}no-leida{% endif %}">
+            <div class="ayuda-header">
+                <div>
+                    <div class="ayuda-tipo tipo-{{ ayuda.tipo }}">
+                        {{ ayuda.get_tipo_display }}
+                    </div>
+                    {% if not ayuda.leida %}
+                        <span class="badge-nuevo">✨ NUEVO</span>
+                    {% endif %}
+                </div>
+                <div style="text-align: right; color: #999; font-size: 0.9em;">
+                    📅 {{ ayuda.fecha_envio|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+            
+            <div class="ayuda-titulo">{{ ayuda.titulo }}</div>
+            
+            <div class="ayuda-contenido">{{ ayuda.contenido }}</div>
+            
+            {% if ayuda.reto %}
+            <div class="reto-link">
+                🎯 Relacionado con: 
+                <a href="{% url 'arena:resolver_reto' ayuda.reto.id %}">{{ ayuda.reto.titulo }}</a>
+            </div>
+            {% endif %}
+            
+            <div class="ayuda-footer">
+                <div class="mentor-info">
+                    <div class="mentor-avatar">
+                        {{ ayuda.mentor.first_name|first }}{{ ayuda.mentor.last_name|first }}
+                    </div>
+                    <div>
+                        <div style="font-weight: bold; color: #333;">{{ ayuda.mentor.get_full_name }}</div>
+                        <div style="font-size: 0.85em;">Tu Mentor</div>
+                    </div>
+                </div>
+                
+                <div>
+                    {% if not ayuda.leida %}
+                        <a href="?marcar_leida={{ ayuda.id }}" 
+                           style="background: #9B30FF; color: white; padding: 8px 20px; border-radius: 20px; text-decoration: none; font-weight: bold;">
+                            ✓ Marcar como Leída
+                        </a>
+                    {% else %}
+                        <span style="color: #4caf50;">✓ Leída el {{ ayuda.fecha_lectura|date:"d/m/Y H:i" }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div style="font-size: 3em; margin-bottom: 20px;">📭</div>
+            <h3>Aún no tienes ayudas de tu mentor</h3>
+            <p style="color: #666; margin-top: 10px;">
+                Cuando tu mentor te envíe pistas o consejos, aparecerán aquí
+            </p>
+        </div>
+    {% endif %}
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{% url 'dashboards:dashboard' %}" class="btn btn-secondary">← Volver al Dashboard</a>
+        <a href="{% url 'arena:torneos_disponibles' %}" class="btn btn-primary" style="margin-left: 10px;">🏆 Ir a la Arena</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Asignar Mentores - Jefe del Capitolio{% endblock %}
+
+{% block extra_css %}
+<style>
+    .mentor-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #9B30FF;
+    }
+    
+    .mentor-card.assigned {
+        border-left-color: #28a745;
+    }
+    
+    .mentor-card.unassigned {
+        border-left-color: #dc3545;
+    }
+    
+    .mentor-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .mentor-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .assignment-status {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+    
+    .status-assigned {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-unassigned {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .assignment-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+    
+    .btn-assign {
+        background: #9B30FF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    
+    .btn-assign:hover {
+        background: #7B20DF;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stat-value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .stat-label {
+        color: #666;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🎯 Asignar Mentores a Distritos</h1>
+    <p>Gestiona las asignaciones de mentores a unidades académicas y distritos</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ mentores.count }}</div>
+        <div class="stat-label">Total Mentores</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ mentores|length|add:"-1" }}</div>
+        <div class="stat-label">Asignados</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">13</div>
+        <div class="stat-label">Distritos</div>
+    </div>
+</div>
+
+<div class="mentores-container">
+    {% for mentor in mentores %}
+    <div class="mentor-card {% if mentor.unidad_academica and mentor.distrito_asignado %}assigned{% else %}unassigned{% endif %}">
+        <div class="mentor-info">
+            <div>
+                <div class="mentor-name">
+                    {{ mentor.get_full_name }}
+                    {% if mentor.distrito_asignado %}
+                        <span style="color: #9B30FF; font-size: 0.8em;">- Distrito {{ mentor.distrito_asignado }}</span>
+                    {% endif %}
+                </div>
+                <div style="color: #666; margin-top: 5px;">
+                    📧 {{ mentor.email }}
+                    {% if mentor.unidad_academica %}
+                        | 🏛️ {{ mentor.unidad_academica }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="assignment-status {% if mentor.unidad_academica and mentor.distrito_asignado %}status-assigned{% else %}status-unassigned{% endif %}">
+                {% if mentor.unidad_academica and mentor.distrito_asignado %}
+                    ✅ Asignado
+                {% else %}
+                    ⚠️ Sin Asignar
+                {% endif %}
+            </div>
+        </div>
+        
+        <form method="post" class="assignment-form">
+            {% csrf_token %}
+            <input type="hidden" name="mentor_id" value="{{ mentor.id }}">
+            
+            <div class="form-group">
+                <label for="unidad_{{ mentor.id }}">Unidad Académica</label>
+                <input 
+                    type="text" 
+                    name="unidad_academica" 
+                    id="unidad_{{ mentor.id }}"
+                    class="form-control"
+                    value="{{ mentor.unidad_academica|default:'' }}"
+                    placeholder="Ej: UARG - Río Gallegos"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="distrito_{{ mentor.id }}">Distrito (1-13)</label>
+                <input 
+                    type="number" 
+                    name="distrito_asignado" 
+                    id="distrito_{{ mentor.id }}"
+                    class="form-control"
+                    value="{{ mentor.distrito_asignado|default:'' }}"
+                    min="1"
+                    max="13"
+                    placeholder="1-13"
+                >
+            </div>
+            
+            <button type="submit" class="btn-assign">
+                💾 Guardar
+            </button>
+        </form>
+    </div>
+    {% empty %}
+    <div style="text-align: center; padding: 40px; color: #666;">
+        <p style="font-size: 1.2em;">No hay mentores registrados</p>
+        <a href="/admin/capitol/personaje/add/" class="btn-assign" style="display: inline-block; text-decoration: none;">
+            ➕ Crear Mentor
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{% url 'dashboards:dashboard' %}" class="btn btn-secondary">← Volver al Dashboard</a>
+</div>
+{% endblock %}

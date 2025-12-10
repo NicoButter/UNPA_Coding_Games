@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Torneo, MentorDistrito, Reto, CasoDePrueba, ParticipacionTributo, RankingDistrito, AyudaMentor
+from .models import (Torneo, MentorDistrito, Reto, CasoDePrueba, ParticipacionTributo, 
+                     RankingDistrito, AyudaMentor, PresupuestoMentor)
 
 
 @admin.register(Torneo)
@@ -150,6 +151,53 @@ class AyudaMentorAdmin(admin.ModelAdmin):
         if not change and request.user.rol == 'mentor':
             obj.mentor = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(PresupuestoMentor)
+class PresupuestoMentorAdmin(admin.ModelAdmin):
+    """Admin para gestionar presupuestos de patrocinio de mentores"""
+    list_display = ['mentor', 'puntos_disponibles_display', 'puntos_totales', 'puntos_usados', 
+                    'total_ayudas_enviadas', 'max_ayudas_por_dia', 'ultima_ayuda_enviada']
+    list_filter = ['fecha_creacion']
+    search_fields = ['mentor__first_name', 'mentor__last_name', 'mentor__username']
+    readonly_fields = ['puntos_usados', 'total_ayudas_enviadas', 'ultima_ayuda_enviada', 
+                       'fecha_creacion', 'fecha_actualizacion']
+    
+    fieldsets = (
+        ('Mentor', {
+            'fields': ('mentor',)
+        }),
+        ('Presupuesto', {
+            'fields': ('puntos_totales', 'puntos_usados', 'max_ayudas_por_dia')
+        }),
+        ('Estadísticas', {
+            'fields': ('total_ayudas_enviadas', 'ultima_ayuda_enviada', 'fecha_creacion', 'fecha_actualizacion')
+        }),
+    )
+    
+    def puntos_disponibles_display(self, obj):
+        return f"{obj.puntos_disponibles} pts"
+    puntos_disponibles_display.short_description = 'Puntos Disponibles'
+    
+    actions = ['recargar_puntos_100', 'recargar_puntos_500', 'recargar_puntos_1000']
+    
+    def recargar_puntos_100(self, request, queryset):
+        for presupuesto in queryset:
+            presupuesto.recargar_puntos(100)
+        self.message_user(request, f'Recargados 100 puntos a {queryset.count()} mentor(es)')
+    recargar_puntos_100.short_description = 'Recargar 100 puntos'
+    
+    def recargar_puntos_500(self, request, queryset):
+        for presupuesto in queryset:
+            presupuesto.recargar_puntos(500)
+        self.message_user(request, f'Recargados 500 puntos a {queryset.count()} mentor(es)')
+    recargar_puntos_500.short_description = 'Recargar 500 puntos'
+    
+    def recargar_puntos_1000(self, request, queryset):
+        for presupuesto in queryset:
+            presupuesto.recargar_puntos(1000)
+        self.message_user(request, f'Recargados 1000 puntos a {queryset.count()} mentor(es)')
+    recargar_puntos_1000.short_description = 'Recargar 1000 puntos'
 
 
 

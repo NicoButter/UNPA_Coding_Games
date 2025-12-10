@@ -16,4 +16,11 @@ urlpatterns = [
     
     # URLs para Tributos
     path('tributo/ayudas/', views.ver_ayudas_view, name='ver_ayudas'),
+    
+    # URLs para Vigilantes
+    path('vigilante/monitoreo/', views.panel_monitoreo_view, name='panel_monitoreo'),
+    
+    # API
+    path('api/notifications/check/', views.check_notifications_api, name='check_notifications'),
+    path('api/monitor/tributos/', views.monitor_tributos_api, name='monitor_tributos'),
 ]

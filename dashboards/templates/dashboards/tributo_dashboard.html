@@ -47,6 +47,32 @@
             </div>
         </div>
 
+        {% if ayudas_pendientes %}
+        <div class="dashboard-card" style="border-left: 4px solid #FFD700; background: linear-gradient(to right, #fff8e1 0%, white 100%);">
+            <h3>✨ Nuevas Ayudas de tu Mentor</h3>
+            <div style="margin-bottom: 15px;">
+                <span style="background: #FFD700; color: #333; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
+                    {{ ayudas_pendientes.count }} sin leer
+                </span>
+            </div>
+            {% for ayuda in ayudas_pendientes %}
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #9B30FF;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                    <div style="font-weight: bold; color: #333;">{{ ayuda.get_tipo_display }}</div>
+                    <div style="font-size: 0.85em; color: #999;">{{ ayuda.fecha_envio|date:"d/m H:i" }}</div>
+                </div>
+                <div style="color: #555; margin-bottom: 10px;">{{ ayuda.titulo }}</div>
+                <a href="{% url 'dashboards:ver_ayudas' %}" style="background: #9B30FF; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; display: inline-block; font-size: 0.9em;">
+                    📖 Leer Ayuda
+                </a>
+            </div>
+            {% endfor %}
+            <a href="{% url 'dashboards:ver_ayudas' %}" style="color: #9B30FF; text-decoration: none; font-weight: bold; display: block; text-align: center; margin-top: 15px;">
+                Ver todas las ayudas →
+            </a>
+        </div>
+        {% endif %}
+
         <div class="dashboard-card">
             <h3>🎮 Mis Competencias</h3>
             <div class="empty-state">
@@ -58,6 +84,19 @@
 
     <div class="dashboard-col-4">
         {% include 'dashboards/components/quick_actions.html' with actions=tributo_actions %}
+        
+        {% if ayudas_recientes %}
+        <div class="dashboard-card">
+            <h3>💬 Ayudas Recientes</h3>
+            {% for ayuda in ayudas_recientes %}
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 8px;">
+                <div style="font-size: 0.85em; color: #666; margin-bottom: 3px;">{{ ayuda.get_tipo_display }}</div>
+                <div style="font-weight: bold; color: #333; font-size: 0.9em;">{{ ayuda.titulo|truncatechars:40 }}</div>
+                <div style="font-size: 0.8em; color: #999; margin-top: 5px;">✓ Leída {{ ayuda.fecha_lectura|timesince }} atrás</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         
         <div class="dashboard-card">
             <h3>🏆 Mi Credencial</h3>

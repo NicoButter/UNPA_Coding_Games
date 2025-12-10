@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Tributos - Mentor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #9B30FF 0%, #667eea 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .tributos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .tributo-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-top: 4px solid #9B30FF;
+        transition: transform 0.3s;
+    }
+    
+    .tributo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    .tributo-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .tributo-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        color: white;
+        margin-right: 15px;
+        font-weight: bold;
+    }
+    
+    .tributo-nombre {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .tributo-codigo {
+        color: #9B30FF;
+        font-size: 0.9em;
+        margin-top: 3px;
+    }
+    
+    .tributo-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .info-item {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    .info-label {
+        font-size: 0.85em;
+        color: #666;
+        display: block;
+    }
+    
+    .info-value {
+        font-weight: bold;
+        color: #333;
+        display: block;
+        margin-top: 3px;
+    }
+    
+    .estado-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    
+    .estado-pendiente { background: #fff3cd; color: #856404; }
+    .estado-acreditado { background: #d1ecf1; color: #0c5460; }
+    .estado-activo { background: #d4edda; color: #155724; }
+    .estado-eliminado { background: #f8d7da; color: #721c24; }
+    .estado-ganador { background: #ffd700; color: #333; }
+    
+    .tributo-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .btn-action {
+        flex: 1;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    
+    .btn-ayuda {
+        background: #9B30FF;
+        color: white;
+    }
+    
+    .btn-ayuda:hover {
+        background: #7B20DF;
+        color: white;
+    }
+    
+    .btn-progreso {
+        background: #f8f9fa;
+        color: #333;
+        border: 2px solid #e0e0e0;
+    }
+    
+    .btn-progreso:hover {
+        background: #e0e0e0;
+        color: #333;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stat-value {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #9B30FF;
+    }
+    
+    .stat-label {
+        color: #666;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👥 Mis Tributos</h1>
+    <p>Gestiona y apoya a los tributos bajo tu mentoría</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ tributos.count }}</div>
+        <div class="stat-label">Total Tributos</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ tributos|length|add:"-1" }}</div>
+        <div class="stat-label">Acreditados</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ tributos|length|add:"-2" }}</div>
+        <div class="stat-label">En Competencia</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Ganadores</div>
+    </div>
+</div>
+
+{% if tributos %}
+<div class="tributos-grid">
+    {% for tributo in tributos %}
+    <div class="tributo-card">
+        <div class="tributo-header">
+            <div class="tributo-avatar">
+                {{ tributo.personaje.first_name|first }}{{ tributo.personaje.last_name|first }}
+            </div>
+            <div>
+                <div class="tributo-nombre">{{ tributo.personaje.get_full_name }}</div>
+                <div class="tributo-codigo">{{ tributo.codigo_tributo }}</div>
+            </div>
+        </div>
+        
+        <div class="tributo-info-grid">
+            <div class="info-item">
+                <span class="info-label">📍 Distrito</span>
+                <span class="info-value">{{ tributo.distrito }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">⭐ Nivel</span>
+                <span class="info-value">{{ tributo.get_nivel_display }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">📚 Tipo</span>
+                <span class="info-value">{{ tributo.get_tipo_display }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">📧 Email</span>
+                <span class="info-value" style="font-size: 0.85em;">{{ tributo.personaje.email|truncatechars:20 }}</span>
+            </div>
+        </div>
+        
+        {% if tributo.lenguajes_programacion %}
+        <div style="background: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            <div style="font-size: 0.85em; color: #2e7d32; margin-bottom: 5px;">💻 Lenguajes:</div>
+            <div style="font-weight: bold; color: #1b5e20;">{{ tributo.lenguajes_programacion }}</div>
+        </div>
+        {% endif %}
+        
+        <div class="estado-badge estado-{{ tributo.estado }}">
+            {{ tributo.get_estado_display }}
+        </div>
+        
+        <div class="tributo-actions">
+            <a href="{% url 'dashboards:enviar_ayuda' %}" class="btn-action btn-ayuda">
+                💡 Enviar Ayuda
+            </a>
+            <a href="#" class="btn-action btn-progreso">
+                📊 Ver Progreso
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 60px; background: white; border-radius: 10px;">
+    <div style="font-size: 3em; margin-bottom: 20px;">👥</div>
+    <h3>No tienes tributos asignados aún</h3>
+    <p style="color: #666; margin-top: 10px;">
+        Contacta al Jefe del Capitolio para que te asigne tributos de tu unidad académica
+    </p>
+</div>
+{% endif %}
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{% url 'dashboards:dashboard' %}" class="btn btn-secondary">← Volver al Dashboard</a>
+    <a href="{% url 'dashboards:enviar_ayuda' %}" class="btn btn-primary" style="margin-left: 10px;">💡 Enviar Ayuda</a>
+</div>
+{% endblock %}

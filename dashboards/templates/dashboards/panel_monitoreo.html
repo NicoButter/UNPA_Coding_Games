@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de Monitoreo - Vigilante{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #1a1a2e;
+        color: #eee;
+    }
+    
+    .monitor-header {
+        background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .live-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .live-dot {
+        width: 12px;
+        height: 12px;
+        background: #ff0000;
+        border-radius: 50%;
+        animation: pulse-red 2s infinite;
+    }
+    
+    @keyframes pulse-red {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid;
+        text-align: center;
+    }
+    
+    .stat-card.active { border-left-color: #00ff00; }
+    .stat-card.pending { border-left-color: #ffd700; }
+    .stat-card.completed { border-left-color: #00bfff; }
+    .stat-card.total { border-left-color: #9B30FF; }
+    
+    .stat-value {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .tributos-monitor {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+    }
+    
+    .tributo-monitor-card {
+        background: #16213e;
+        border-radius: 10px;
+        padding: 15px;
+        border: 2px solid #0f3460;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .tributo-monitor-card.activo {
+        border-color: #00ff00;
+        box-shadow: 0 0 20px rgba(0,255,0,0.3);
+    }
+    
+    .tributo-monitor-card.acreditado {
+        border-color: #ffd700;
+    }
+    
+    .tributo-monitor-card.pendiente {
+        border-color: #666;
+        opacity: 0.6;
+    }
+    
+    .tributo-monitor-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, #00ff00, transparent);
+        animation: scan 3s linear infinite;
+    }
+    
+    .tributo-monitor-card.activo::before {
+        display: block;
+    }
+    
+    @keyframes scan {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    
+    .tributo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 10px;
+    }
+    
+    .tributo-nombre {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+    
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.75em;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .status-activo {
+        background: #00ff00;
+        color: #000;
+        animation: pulse-green 2s infinite;
+    }
+    
+    .status-acreditado { background: #ffd700; color: #000; }
+    .status-pendiente { background: #666; color: #fff; }
+    .status-eliminado { background: #ff0000; color: #fff; }
+    
+    @keyframes pulse-green {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .progreso-retos {
+        margin: 10px 0;
+        padding: 10px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 5px;
+    }
+    
+    .progreso-bar {
+        background: #333;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+        margin-top: 5px;
+    }
+    
+    .progreso-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00ff00, #00ff00);
+        transition: width 0.5s;
+        border-radius: 10px;
+    }
+    
+    .actividad-reciente {
+        font-size: 0.85em;
+        color: #aaa;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #333;
+    }
+    
+    .auto-refresh-control {
+        background: rgba(255,255,255,0.1);
+        padding: 10px 20px;
+        border-radius: 25px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .refresh-toggle {
+        width: 50px;
+        height: 25px;
+        background: #666;
+        border-radius: 25px;
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .refresh-toggle.active {
+        background: #00ff00;
+    }
+    
+    .refresh-toggle::after {
+        content: '';
+        width: 21px;
+        height: 21px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s;
+    }
+    
+    .refresh-toggle.active::after {
+        transform: translateX(25px);
+    }
+    
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+        padding: 10px 20px;
+        background: #16213e;
+        border: 2px solid #0f3460;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .filter-tab.active {
+        background: #9B30FF;
+        border-color: #9B30FF;
+    }
+    
+    .filter-tab:hover {
+        border-color: #9B30FF;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="monitor-header">
+    <div>
+        <h1 style="margin: 0;">🎮 Panel de Monitoreo en Vivo</h1>
+        <p style="margin: 5px 0 0 0; color: #aaa;">Supervisión de tributos en competencia</p>
+    </div>
+    
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+        <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span style="font-weight: bold;">EN VIVO</span>
+        </div>
+        
+        <div class="auto-refresh-control">
+            <span>Auto-actualización</span>
+            <div class="refresh-toggle active" id="autoRefreshToggle" onclick="toggleAutoRefresh()"></div>
+            <span id="refreshTimer">5s</span>
+        </div>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card active">
+        <div class="stat-value" id="stat-activos">0</div>
+        <div class="stat-label">Activos Ahora</div>
+    </div>
+    <div class="stat-card pending">
+        <div class="stat-value" id="stat-acreditados">0</div>
+        <div class="stat-label">Acreditados</div>
+    </div>
+    <div class="stat-card completed">
+        <div class="stat-value" id="stat-completados">0</div>
+        <div class="stat-label">Retos Completados Hoy</div>
+    </div>
+    <div class="stat-card total">
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total Tributos</div>
+    </div>
+</div>
+
+<div class="filter-tabs">
+    <div class="filter-tab active" data-filter="all">Todos</div>
+    <div class="filter-tab" data-filter="activo">En Competencia</div>
+    <div class="filter-tab" data-filter="acreditado">Acreditados</div>
+    <div class="filter-tab" data-filter="pendiente">Pendientes</div>
+</div>
+
+<div class="tributos-monitor" id="tributosMonitor">
+    <!-- Los tributos se cargarán dinámicamente con JavaScript -->
+</div>
+
+<script>
+let autoRefreshEnabled = true;
+let refreshInterval = null;
+let currentFilter = 'all';
+let lastUpdate = Date.now();
+
+// Configurar filtros
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        loadTributos();
+    });
+});
+
+function toggleAutoRefresh() {
+    const toggle = document.getElementById('autoRefreshToggle');
+    autoRefreshEnabled = !autoRefreshEnabled;
+    
+    if (autoRefreshEnabled) {
+        toggle.classList.add('active');
+        startAutoRefresh();
+    } else {
+        toggle.classList.remove('active');
+        stopAutoRefresh();
+    }
+}
+
+function startAutoRefresh() {
+    if (refreshInterval) clearInterval(refreshInterval);
+    
+    let countdown = 5;
+    refreshInterval = setInterval(() => {
+        countdown--;
+        document.getElementById('refreshTimer').textContent = countdown + 's';
+        
+        if (countdown <= 0) {
+            loadTributos();
+            countdown = 5;
+        }
+    }, 1000);
+}
+
+function stopAutoRefresh() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+    document.getElementById('refreshTimer').textContent = '--';
+}
+
+async function loadTributos() {
+    try {
+        const response = await fetch(`/api/monitor/tributos/?filter=${currentFilter}`);
+        const data = await response.json();
+        
+        // Actualizar estadísticas
+        document.getElementById('stat-activos').textContent = data.stats.activos;
+        document.getElementById('stat-acreditados').textContent = data.stats.acreditados;
+        document.getElementById('stat-completados').textContent = data.stats.completados_hoy;
+        document.getElementById('stat-total').textContent = data.stats.total;
+        
+        // Renderizar tributos
+        renderTributos(data.tributos);
+        
+        lastUpdate = Date.now();
+    } catch (error) {
+        console.error('Error loading tributos:', error);
+    }
+}
+
+function renderTributos(tributos) {
+    const container = document.getElementById('tributosMonitor');
+    
+    if (tributos.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: #666;">
+                <div style="font-size: 3em; margin-bottom: 20px;">👥</div>
+                <h3>No hay tributos que mostrar</h3>
+                <p>Cambia el filtro o espera a que se registren tributos</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = tributos.map(tributo => `
+        <div class="tributo-monitor-card ${tributo.estado}">
+            <div class="tributo-header">
+                <div>
+                    <div class="tributo-nombre">${tributo.nombre}</div>
+                    <div style="font-size: 0.85em; color: #999;">${tributo.codigo} | Distrito ${tributo.distrito}</div>
+                </div>
+                <div class="status-badge status-${tributo.estado}">
+                    ${tributo.estado_display}
+                </div>
+            </div>
+            
+            <div class="progreso-retos">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-size: 0.9em;">Retos</span>
+                    <span style="font-weight: bold;">${tributo.retos_completados}/${tributo.total_retos}</span>
+                </div>
+                <div class="progreso-bar">
+                    <div class="progreso-fill" style="width: ${tributo.porcentaje_completado}%"></div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
+                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 5px; text-align: center;">
+                    <div style="font-size: 1.2em; font-weight: bold; color: #ffd700;">${tributo.puntos}</div>
+                    <div style="font-size: 0.75em; color: #999;">Puntos</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 5px; text-align: center;">
+                    <div style="font-size: 1.2em; font-weight: bold; color: #00ff00;">${tributo.nivel}</div>
+                    <div style="font-size: 0.75em; color: #999;">Nivel</div>
+                </div>
+            </div>
+            
+            <div class="actividad-reciente">
+                📍 Última actividad: ${tributo.ultima_actividad || 'Sin actividad'}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Iniciar monitoreo
+loadTributos();
+startAutoRefresh();
+
+// Limpiar al salir
+window.addEventListener('beforeunload', () => {
+    stopAutoRefresh();
+});
+</script>
+{% endblock %}
