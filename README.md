@@ -1,102 +1,586 @@
 # UNPA Coding Games 🎮
 
+[![Django Version](https://img.shields.io/badge/Django-5.0.14-green.svg)](https://djangoproject.com/)
+[![Python Version](https://img.shields.io/badge/Python-3.14+-blue.svg)](https://python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Sistema de competencia de programación inspirado en Los Juegos del Hambre para la Universidad Nacional de la Patagonia Austral (UNPA).
+
+> *En el Capitolio, el código es ley. En la arena, solo sobreviven los mejores programadores.* 🔥
+
+## 📋 Tabla de Contenidos
+
+- [Descripción](#descripción)
+- [Características Principales](#características-principales)
+- [Arquitectura](#arquitectura)
+- [Tecnologías](#tecnologías)
+- [Instalación](#instalación)
+- [Configuración](#configuración)
+- [Uso](#uso)
+- [Roles del Sistema](#roles-del-sistema)
+- [API](#api)
+- [Desarrollo](#desarrollo)
+- [Despliegue](#despliegue)
+- [Testing](#testing)
+- [Contribuir](#contribuir)
+- [Licencia](#licencia)
+- [Contacto](#contacto)
 
 ## Descripción
 
-Plataforma web que permite a estudiantes (tributos) participar en torneos y retos de programación, organizados por distritos con mentores asignados y supervisados por vigilantes, todo bajo la administración del Jefe del Capitolio.
+Plataforma web completa que simula un sistema de competencias de programación con temática de "Los Juegos del Hambre". Los estudiantes (tributos) compiten en torneos organizados por distritos, guiados por mentores y supervisados por vigilantes, bajo la administración del Jefe del Capitolio.
 
-## Características
+### 🎯 Objetivos
 
-- 🏆 **Gestión de Torneos**: Creación y administración de competencias
-- 💻 **Retos de Programación**: Desafíos con validación automática
-- 👥 **Sistema de Roles**: Tributo, Mentor, Vigilante, Jefe del Capitolio
-- 🏅 **Rankings por Distrito**: Sistema de puntuación y leaderboards
-- 📊 **Dashboards Personalizados**: Interfaces específicas para cada rol
-- 🎫 **Credenciales QR**: Acreditación de tributos mediante códigos QR
+- Fomentar la práctica de algoritmos y estructuras de datos
+- Crear un ambiente competitivo educativo
+- Desarrollar habilidades de resolución de problemas
+- Integrar tecnologías modernas en la educación
+
+## Características Principales
+
+### 🏆 Sistema de Competencias
+- **Torneos Multi-nivel**: Competencias con diferentes dificultades
+- **Validación Automática**: Ejecución segura de código con casos de prueba
+- **Puntuación Dinámica**: Sistema de puntos basado en eficiencia y complejidad
+- **Rankings en Tiempo Real**: Clasificaciones por distrito y global
+
+### 👥 Gestión Jerárquica de Roles
+- **4 Roles Distintos**: Tributo, Mentor, Vigilante, Jefe del Capitolio
+- **Asignaciones Dinámicas**: Mentores por unidad académica, Vigilantes por torneo
+- **Permisos Granulares**: Control de acceso basado en roles
+
+### 🎫 Sistema de Acreditación
+- **Credenciales QR Únicas**: Generación automática de códigos QR
+- **Acreditación Web**: Escaneo QR mediante webcam del navegador
+- **Envío Automático**: Credenciales PDF enviadas por email
+- **Estados de Tributo**: Seguimiento completo del proceso de acreditación
+
+### 💰 Sistema de Patrocinio
+- **Presupuesto de Puntos**: 1000 puntos iniciales por mentor
+- **Ayudas Diferenciadas**: 5 tipos de ayuda con costos variables
+- **Límites Diarios**: Máximo 10 ayudas por día
+- **Notificaciones en Tiempo Real**: Alertas cuando llegan ayudas
+
+### 📊 Dashboards Personalizados
+- **Interfaz Adaptativa**: Diseño específico para cada rol
+- **Estadísticas en Vivo**: Métricas actualizadas automáticamente
+- **Panel de Monitoreo**: Vigilancia en tiempo real de competencias
+- **Gestión de Asignaciones**: Interfaces para asignar mentores y vigilantes
+
+### 🔔 Notificaciones Avanzadas
+- **Polling Inteligente**: Actualización cada 30 segundos
+- **Toast Notifications**: Alertas no intrusivas
+- **Badges de Estado**: Contadores visuales
+- **Sonido Opcional**: Notificaciones auditivas
+
+### 🔒 Seguridad y Rendimiento
+- **Ejecución Aislada**: Código ejecutado en subprocess seguros
+- **Middleware de Acceso**: Control automático de permisos
+- **Validación de Input**: Sanitización completa de datos
+- **Logs de Auditoría**: Registro de operaciones críticas
+
+## Arquitectura
+
+### 🏗️ Arquitectura General
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend       │    │   Database      │
+│   (Templates +  │◄──►│   (Django)      │◄──►│   (SQLite/PostgreSQL)
+│    JavaScript)  │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Templates     │    │   Models        │    │   Migrations    │
+│   (HTML/CSS/JS) │    │   (Python)      │    │   (SQL)         │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### 📁 Estructura del Proyecto
+
+```
+UNPA_Coding_Games/
+├── 📂 capitol/                    # 👤 Autenticación y gestión de usuarios
+│   ├── models.py                 # Personaje, TributoInfo
+│   ├── views.py                  # Login, registro, acreditación QR
+│   ├── middleware.py             # AccreditationMiddleware
+│   ├── utils.py                  # Generación de credenciales PDF
+│   ├── templates/capitol/        # Login, registro, acreditación
+│   └── static/capitol/           # CSS, JS, imágenes
+├── 📂 arena/                      # 🏆 Gestión de torneos y retos
+│   ├── models.py                 # Torneo, Reto, Participacion, AyudaMentor, PresupuestoMentor
+│   ├── views.py                  # Arena, resolución de retos
+│   ├── patrocinio.py             # Lógica de sistema de ayudas
+│   ├── templates/arena/          # Arena, editor de código
+│   └── static/arena/             # CSS específico de arena
+├── 📂 dashboards/                 # 📊 Dashboards por rol
+│   ├── views.py                  # Dashboards y APIs REST
+│   ├── forms.py                  # Asignaciones, envío de ayudas
+│   ├── templates/dashboards/     # 6 templates especializados
+│   └── static/dashboards/js/     # notifications.js
+├── 📂 centro_control/             # 👁️ Centro de control
+│   └── templates/centro_control/ # Acreditación QR
+├── 📂 unpa_code_games/            # ⚙️ Configuración del proyecto
+│   ├── settings.py               # Configuración Django
+│   ├── urls.py                   # URLs principales
+│   └── wsgi.py                   # WSGI para despliegue
+├── 📂 PSI/                        # 📋 Documentación
+│   ├── Especificacion_Requerimientos.md
+│   └── Casos_de_Uso.md
+├── 📄 requirements.txt            # 📦 Dependencias Python
+├── 📄 .env.example               # 🔐 Variables de entorno
+├── 🐍 manage.py                  # Django CLI
+└── 📄 README.md                  # Este archivo
+```
+
+### 🗄️ Modelo de Datos Principal
+
+```mermaid
+graph TD
+    A[Personaje] --> B[TributoInfo]
+    A --> C[PresupuestoMentor]
+    B --> D[AyudaMentor]
+    E[Torneo] --> F[Reto]
+    F --> G[CasoDePrueba]
+    F --> H[ParticipacionTributo]
+    E --> I[Vigilantes Asignados]
+    D --> J[Mentor]
+    D --> B
+```
 
 ## Tecnologías
 
-- **Backend**: Django 5.0.14
-- **Base de Datos**: SQLite3 (desarrollo) / PostgreSQL (producción)
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Autenticación**: Django Custom User Model
-- **QR Codes**: python-qrcode + Pillow
+### Backend
+- **Django 5.0.14** - Framework web MVC
+- **Python 3.14+** - Lenguaje de programación
+- **SQLite3** - Base de datos (desarrollo)
+- **PostgreSQL/MySQL** - Base de datos (producción)
+
+### Frontend
+- **HTML5/CSS3** - Estructura y estilos
+- **JavaScript ES6+** - Interactividad
+- **jsQR** - Lectura de códigos QR en navegador
+- **Web Audio API** - Notificaciones sonoras
+
+### Librerías Python
+- **python-qrcode + Pillow** - Generación de QR
+- **ReportLab** - Creación de PDFs
+- **python-decouple** - Gestión de variables de entorno
+
+### Infraestructura
+- **Gunicorn** - WSGI HTTP Server
+- **Nginx** - Servidor web (producción)
+- **Docker** - Contenedorización (opcional)
 
 ## Instalación
 
 ### Prerrequisitos
 
-- Python 3.14+
-- pip
-- virtualenv
+- **Python 3.14+**
+- **pip** (viene con Python)
+- **Git**
+- **Virtualenv** (recomendado)
 
-### Pasos
+### 🚀 Instalación Rápida
 
-1. **Clonar el repositorio**
 ```bash
+# 1. Clonar repositorio
 git clone https://github.com/NicoButter/UNPA_Coding_Games.git
 cd UNPA_Coding_Games
-```
 
-2. **Crear y activar entorno virtual**
-```bash
+# 2. Crear entorno virtual
 python -m venv venv
-source venv/bin/activate  # En Linux/Mac
-# venv\Scripts\activate  # En Windows
-```
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate   # Windows
 
-3. **Instalar dependencias**
-```bash
+# 3. Instalar dependencias
 pip install -r requirements.txt
-```
 
-4. **Configurar variables de entorno**
-```bash
+# 4. Configurar entorno
 cp .env.example .env
 # Editar .env con tus valores
-```
 
-5. **Ejecutar migraciones**
-```bash
+# 5. Preparar base de datos
 python manage.py migrate
-```
 
-6. **Crear superusuario**
-```bash
+# 6. Crear administrador
 python manage.py createsuperuser
-```
 
-7. **Ejecutar servidor de desarrollo**
-```bash
+# 7. Ejecutar servidor
 python manage.py runserver
 ```
 
-Acceder a http://127.0.0.1:8000/
+Acceder a **http://127.0.0.1:8000/**
 
-## Estructura del Proyecto
+### 📦 Dependencias
 
-```
-UNPA_Coding_Games/
-├── capitol/           # Autenticación y gestión de usuarios
-├── centro_control/    # Monitoreo y acreditación
-├── dashboards/        # Dashboards por rol
-├── arena/            # Gestión de torneos y retos
-├── templates/        # Templates globales
-├── static/          # Archivos estáticos globales
-├── media/           # Archivos subidos por usuarios
-└── unpa_code_games/ # Configuración del proyecto
+```txt
+Django==5.0.14
+python-decouple==3.8
+qrcode[pil]==8.0
+Pillow==12.0.0
+reportlab==4.4.5
 ```
 
-## Variables de Entorno
+## Configuración
 
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+### Variables de Entorno (.env)
 
 ```env
-# Django Settings
-SECRET_KEY=tu-secret-key-aqui
+# Django Core
+SECRET_KEY=tu-secret-key-super-segura-aqui
 DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS=localhost,127.0.0.1,127.0.0.1:8000
+
+# Base de Datos (SQLite por defecto)
+DATABASE_URL=sqlite:///db.sqlite3
+
+# Base de Datos PostgreSQL (opcional)
+# DB_ENGINE=django.db.backends.postgresql
+# DB_NAME=unpa_coding_games
+# DB_USER=postgres
+# DB_PASSWORD=tu_password_segura
+# DB_HOST=localhost
+# DB_PORT=5432
+
+# Email Configuration
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=tu_email@gmail.com
+EMAIL_HOST_PASSWORD=tu_app_password
+DEFAULT_FROM_EMAIL=UNPA Coding Games <tu_email@gmail.com>
+
+# Security
+SECURE_SSL_REDIRECT=False
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
+
+# Media Files
+MEDIA_URL=/media/
+MEDIA_ROOT=media/
+
+# Static Files
+STATIC_URL=/static/
+STATIC_ROOT=staticfiles/
+```
+
+### Configuración de Email
+
+Para envío de credenciales PDF:
+
+1. **Gmail**: Generar "App Password" en configuración de seguridad
+2. **Outlook/Hotmail**: Usar SMTP de Microsoft
+3. **Desarrollo**: Usar `EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend`
+
+## Uso
+
+### 🎮 Flujo Básico del Sistema
+
+1. **Registro de Tributo** → Email con credencial QR
+2. **Acreditación** → Escaneo QR por vigilante
+3. **Acceso a Arena** → Participación en torneos
+4. **Resolución de Retos** → Validación automática
+5. **Sistema de Ayudas** → Mentores envían soporte
+6. **Monitoreo** → Vigilantes supervisan en tiempo real
+
+### 👑 Roles del Sistema
+
+#### 👤 Tributo (Estudiante)
+- ✅ Registrarse y obtener credencial QR
+- ✅ Acceder a torneos acreditados
+- ✅ Resolver retos de programación
+- ✅ Recibir ayudas de mentores
+- ✅ Ver rankings y progreso personal
+
+#### 🎓 Mentor (Docente)
+- ✅ Gestionar tributos de su unidad académica
+- ✅ Enviar ayudas con presupuesto de puntos
+- ✅ Ver progreso de sus estudiantes
+- ✅ Acceder a estadísticas detalladas
+
+#### 👁️ Vigilante (Staff)
+- ✅ Acreditar tributos mediante QR
+- ✅ Monitorear competencias en tiempo real
+- ✅ Supervisar participación activa
+- ✅ Generar reportes de actividad
+
+#### 👑 Jefe del Capitolio (Administrador)
+- ✅ Crear y gestionar torneos completos
+- ✅ Asignar mentores a unidades académicas
+- ✅ Asignar vigilantes a torneos
+- ✅ Administrar todo el sistema
+
+### 📊 Dashboards por Rol
+
+Cada rol tiene un dashboard personalizado:
+
+- **Tributo**: Torneos disponibles, ayudas pendientes, progreso personal
+- **Mentor**: Tributos asignados, presupuesto, estadísticas de ayudas
+- **Vigilante**: Panel de acreditación, monitoreo en vivo
+- **Jefe**: Asignaciones, estadísticas globales, administración
+
+## API
+
+### Endpoints REST
+
+#### Notificaciones
+```
+GET /api/notifications/check/
+```
+- **Descripción**: Obtiene contador de ayudas no leídas
+- **Respuesta**: `{"pendientes": 3}`
+
+#### Monitoreo
+```
+GET /api/monitor/tributos/
+```
+- **Descripción**: Datos en tiempo real de tributos
+- **Respuesta**: Array de objetos con estadísticas
+
+### WebSockets (Futuro)
+- Notificaciones en tiempo real
+- Actualizaciones de rankings
+- Chat entre mentores y tributos
+
+## Desarrollo
+
+### 🧪 Ejecutar Tests
+
+```bash
+# Todos los tests
+python manage.py test
+
+# Tests específicos
+python manage.py test capitol.tests
+python manage.py test arena.tests
+
+# Con coverage
+coverage run manage.py test
+coverage report
+```
+
+### 📊 Crear Migraciones
+
+```bash
+# Detectar cambios en modelos
+python manage.py makemigrations
+
+# Aplicar migraciones
+python manage.py migrate
+
+# Mostrar SQL de migración
+python manage.py sqlmigrate arena 0001
+```
+
+### 🎨 Desarrollo Frontend
+
+```bash
+# Colectar archivos estáticos
+python manage.py collectstatic
+
+# Modo debug para desarrollo CSS/JS
+DEBUG=True en .env
+```
+
+### 🔍 Debugging
+
+```bash
+# Ver queries ejecutadas
+python manage.py shell_plus --print-sql
+
+# Debug toolbar (instalar django-debug-toolbar)
+pip install django-debug-toolbar
+```
+
+## Despliegue
+
+### 🚀 Producción con Gunicorn + Nginx
+
+```bash
+# 1. Configurar variables de producción
+DEBUG=False
+ALLOWED_HOSTS=tu-dominio.com
+
+# 2. Colectar estáticos
+python manage.py collectstatic
+
+# 3. Ejecutar con Gunicorn
+gunicorn unpa_code_games.wsgi:application --bind 0.0.0.0:8000
+
+# 4. Configurar Nginx como proxy reverso
+```
+
+### 🐳 Docker (Opcional)
+
+```dockerfile
+FROM python:3.14-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+RUN python manage.py migrate
+
+EXPOSE 8000
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+```
+
+## Testing
+
+### Estrategia de Testing
+
+- **Unit Tests**: Modelos y lógica de negocio
+- **Integration Tests**: Vistas y formularios
+- **E2E Tests**: Flujos completos (Selenium opcional)
+
+### Ejecutar Suite de Tests
+
+```bash
+# Tests básicos
+python manage.py test
+
+# Tests con verbose
+python manage.py test --verbosity=2
+
+# Tests paralelos
+python manage.py test --parallel
+
+# Coverage
+pip install coverage
+coverage run manage.py test
+coverage html  # Genera reporte HTML
+```
+
+## Contribuir
+
+### 🤝 Guía de Contribución
+
+1. **Fork** el proyecto
+2. **Crear rama** feature: `git checkout -b feature/nueva-funcionalidad`
+3. **Commits** descriptivos: `git commit -m 'feat: agregar validación avanzada'`
+4. **Push** a rama: `git push origin feature/nueva-funcionalidad`
+5. **Pull Request** con descripción detallada
+
+### 📝 Estándares de Código
+
+- **PEP 8** para Python
+- **Black** para formateo automático
+- **Flake8** para linting
+- **Pre-commit hooks** recomendados
+
+### 🔄 Workflow Git
+
+```bash
+# Actualizar main
+git checkout main
+git pull origin main
+
+# Crear rama feature
+git checkout -b feature/nueva-feature
+
+# Desarrollo...
+git add .
+git commit -m "feat: descripción"
+
+# Push y PR
+git push origin feature/nueva-feature
+```
+
+## Troubleshooting
+
+### 🔧 Problemas Comunes
+
+#### Error de Migraciones
+```bash
+# Resetear migraciones
+python manage.py migrate --fake-initial
+python manage.py migrate
+```
+
+#### Email no se envía
+- Verificar credenciales SMTP
+- Usar `EMAIL_BACKEND=console` para desarrollo
+- Revisar logs de servidor
+
+#### QR no se lee
+- Verificar permisos de cámara
+- Probar en HTTPS (requerido para webcam)
+- Verificar librería jsQR cargada
+
+#### Código no ejecuta
+- Verificar sintaxis Python
+- Revisar límites de tiempo/memoria
+- Ver logs de servidor
+
+### 📞 Soporte
+
+- **Issues**: [GitHub Issues](https://github.com/NicoButter/UNPA_Coding_Games/issues)
+- **Discussions**: Para preguntas generales
+- **Email**: nicobutter@gmail.com
+
+## Licencia
+
+Este proyecto está bajo la **Licencia MIT**. Ver archivo `LICENSE` para más detalles.
+
+```
+MIT License
+
+Copyright (c) 2025 Nicolas Butterfield
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
+
+## Contacto
+
+**Nicolas Butterfield**  
+🎓 **Desarrollador Principal**  
+📧 nicobutter@gmail.com  
+🔗 [LinkedIn](https://linkedin.com/in/nicolasbutterfield)  
+🐙 [GitHub](https://github.com/NicoButter)
+
+**Universidad Nacional de la Patagonia Austral (UNPA)**  
+📍 Río Gallegos, Santa Cruz, Argentina  
+🌐 [unpa.edu.ar](https://unpa.edu.ar)
+
+---
+
+## 🎯 Roadmap
+
+### ✅ Versión 1.0 (Actual)
+- Sistema jerárquico completo
+- Acreditación QR
+- Sistema de patrocinio
+- Monitoreo en tiempo real
+- Notificaciones avanzadas
+
+### 🚧 Próximas Features
+- [ ] WebSockets para notificaciones en tiempo real
+- [ ] Sistema de chat mentor-tributo
+- [ ] Análisis de código con IA
+- [ ] Torneos en tiempo real
+- [ ] Integración con jueces online (Codeforces, etc.)
+- [ ] App móvil complementaria
+
+---
+
+*Que los códigos comiencen... y que el mejor programador gane!* 🔥⚡
+
+---
+
+**Desarrollado con ❤️ para la comunidad de programadores de la UNPA**
 
 # Database (PostgreSQL - opcional)
 # DB_ENGINE=django.db.backends.postgresql
