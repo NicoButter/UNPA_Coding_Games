@@ -27,14 +27,7 @@
 
 /* Dashboard Header */
 .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(107, 59, 107, 0.05) 100%);
-    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
-    padding: 24px 40px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+    display: none;
 }
 
 .dashboard-title {
@@ -166,7 +159,15 @@
     padding: 0;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     overflow-x: auto;
+    gap: 0;
+}
+
+.dashboard-nav-left,
+.dashboard-nav-right {
+    display: flex;
+    align-items: center;
     gap: 0;
 }
 

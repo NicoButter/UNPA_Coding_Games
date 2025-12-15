@@ -26,10 +26,11 @@
                 </a>
             </div>
             <div class="title">
-                <h1>🔥 Coding Games 🔥</h1>
-                <p class="subtitle">Hunger Games de Programación - UNPA</p>
+                <h1>{% block header_title %}🔥 Coding Games 🔥{% endblock %}</h1>
+                <p class="subtitle">{% block header_subtitle %}Hunger Games de Programación - UNPA{% endblock %}</p>
             </div>
             <nav class="nav-links">
+                {% block nav_links %}
                 {% if user.is_authenticated %}
                     <a href="{% url 'perfil' %}">👤 Perfil</a>
                     <a href="{% url 'dashboards:dashboard' %}">📊 Dashboard</a>
@@ -41,6 +42,7 @@
                     <a href="{% url 'login' %}">🔐 Ingreso al Capitolio</a>
                     <a href="{% url 'register' %}">📝 Acreditarse como Tributo</a>
                 {% endif %}
+                {% endblock %}
             </nav>
         </div>
     </header>

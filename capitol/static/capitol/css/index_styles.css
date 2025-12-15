@@ -1,63 +1,77 @@
-/* Estilos para el contenedor de bienvenida */
-.welcome-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: center;
-    position: absolute;
-    top: 25%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
-    border-radius: 15px; 
-    backdrop-filter: blur(10px); 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+/* Navbar de bienvenida */
+.welcome-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(45, 45, 45, 0.95));
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 10;
 }
 
-.welcome-container h2 {
-    color: #fff;
-    margin-bottom: 20px;
+.welcome-text {
+    flex: 1;
 }
 
-.welcome-container p {
-    color: #fff;
-    margin-bottom: 20px;
+.welcome-text h2 {
+    color: #d4af37;
+    margin: 0 0 8px 0;
+    font-size: 1.8em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/* Estilos para el botón redondo */
+.welcome-text p {
+    color: #e8e4d9;
+    margin: 0;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/* Estilos para el botón */
 .btn {
     display: inline-block;
-    padding: 10px 20px;
-    background-color: #d9534f;
-    color: white;
+    padding: 12px 32px;
+    background: linear-gradient(135deg, #d4af37, #b8940a);
+    color: #0a0a0a;
     text-decoration: none;
-    border-radius: 50px; 
-    font-size: 16px;
-    margin-top: 20px;
-    transition: background-color 0.3s ease;
+    border-radius: 50px;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    white-space: nowrap;
 }
 
 .btn:hover {
-    background-color: #c9302c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
 }
 
 /* Estilos para el carrusel */
 .carousel {
     position: relative;
-    width: 100vw; 
-    height: 90vh; 
-    overflow: hidden; 
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .carousel-images {
     display: flex;
     transition: transform 0.5s ease-in-out;
-    width: 100%; 
+    width: 100%;
+    height: 100%;
 }
 
 .carousel-images img {
     width: 100%;
-    height: auto;
+    min-width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 

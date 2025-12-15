@@ -83,6 +83,65 @@ header {
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
 
+/* Avatar en header */
+.header-avatar-link {
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.header-avatar-link:hover {
+    border: 2px solid #d4af37;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+    transform: scale(1.05);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+.avatar-placeholder-header {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    background: rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+}
+
+.logout-btn {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.95em;
+    padding: 10px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: rgba(212, 175, 55, 0.1);
+    font-weight: 500;
+}
+
+.logout-btn:hover {
+    background-color: rgba(212, 175, 55, 0.3);
+    border-color: #d4af37;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
 /* Estilos del contenido principal */
 main {
     flex: 1;

@@ -1,7 +1,8 @@
 {% extends 'dashboards/base_dashboard.html' %}
+
 {% load static %}
 
-{% block dashboard_title %}Control del Capitolio{% endblock %}
+{% block header_title %}🏛️ Control del Capitolio{% endblock %}
 
 {% block dashboard_extra_styles %}
     <link rel="stylesheet" href="{% static 'dashboards/css/jefe_capitolio_dashboard.css' %}">
@@ -11,9 +12,8 @@
     <a href="#resumen" class="nav-link active">📊 Resumen</a>
     <a href="#distritos" class="nav-link">🏛️ Distritos</a>
     <a href="#competencias" class="nav-link">🎮 Competencias</a>
-    <a href="#usuarios" class="nav-link">👥 Usuarios</a>
     <a href="#reportes" class="nav-link">📈 Reportes</a>
-    <a href="{% url 'admin:index' %}" class="nav-link">⚙️ Administración</a>
+    <a href="{% url 'dashboards:admin_jefe' %}" class="nav-link">⚙️ Administración</a>
 {% endblock %}
 
 {% block dashboard_stats %}

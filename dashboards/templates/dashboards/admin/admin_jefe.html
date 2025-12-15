@@ -1,0 +1,162 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% load static %}
+
+{% block header_title %}⚙️ Administración del Capitolio{% endblock %}
+
+{% block dashboard_extra_styles %}
+    <link rel="stylesheet" href="{% static 'dashboards/css/jefe_capitolio_dashboard.css' %}">
+{% endblock %}
+
+{% block dashboard_nav %}
+    <a href="{% url 'dashboards:dashboard' %}" class="nav-link">📊 Resumen</a>
+    <a href="{% url 'dashboards:admin_jefe' %}" class="nav-link active">⚙️ Panel Admin</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="admin-container">
+    <div class="admin-section">
+        <h2>Gestión del Torneo</h2>
+        <div class="admin-grid">
+            <!-- Crear Torneo Anual -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3>🏆 Crear Torneo Anual</h3>
+                </div>
+                <div class="admin-card-body">
+                    <p>Crea y configura el torneo anual de The Coding Games</p>
+                    <a href="{% url 'dashboards:crear_torneo' %}" class="admin-btn">
+                        Crear Torneo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Crear Retos -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3>🎮 Crear Retos</h3>
+                </div>
+                <div class="admin-card-body">
+                    <p>Define los retos de programación para el torneo</p>
+                    <a href="{% url 'dashboards:crear_retos' %}" class="admin-btn">
+                        Crear Retos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h2>Asignaciones</h2>
+        <div class="admin-grid">
+            <!-- Asignar Mentores -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3>👨‍🏫 Asignar Mentores por Distrito</h3>
+                </div>
+                <div class="admin-card-body">
+                    <p>Asigna mentores a cada distrito para acompañar a los tributos</p>
+                    <a href="{% url 'dashboards:asignar_mentores_admin' %}" class="admin-btn">
+                        Asignar Mentores
+                    </a>
+                </div>
+            </div>
+
+            <!-- Asignar Vigilantes -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3>👁️ Asignar Vigilantes</h3>
+                </div>
+                <div class="admin-card-body">
+                    <p>Designa vigilantes para monitorear a los tributos</p>
+                    <a href="{% url 'dashboards:asignar_vigilantes_admin' %}" class="admin-btn">
+                        Asignar Vigilantes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-container {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .admin-section h2 {
+        color: #d4af37;
+        font-size: 1.8em;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 25px;
+    }
+
+    .admin-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .admin-card:hover {
+        border-color: rgba(212, 175, 55, 0.5);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.1);
+    }
+
+    .admin-card-header {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(107, 59, 107, 0.1));
+        padding: 20px;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .admin-card-header h3 {
+        color: #d4af37;
+        margin: 0;
+        font-size: 1.3em;
+    }
+
+    .admin-card-body {
+        padding: 20px;
+    }
+
+    .admin-card-body p {
+        color: #c0c0c0;
+        margin: 0 0 20px 0;
+        line-height: 1.6;
+    }
+
+    .admin-btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #d4af37, #b8940a);
+        color: #0a0a0a;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9em;
+    }
+
+    .admin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(212, 175, 55, 0.3);
+    }
+
+    .admin-btn:active {
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}

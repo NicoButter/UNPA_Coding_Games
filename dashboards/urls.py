@@ -20,6 +20,13 @@ urlpatterns = [
     # URLs para Vigilantes
     path('vigilante/monitoreo/', views.panel_monitoreo_view, name='panel_monitoreo'),
     
+    # Administración personalizada
+    path('jefe/admin/', views.admin_jefe_view, name='admin_jefe'),
+    path('jefe/crear-torneo/', views.crear_torneo_view, name='crear_torneo'),
+    path('jefe/crear-retos/', views.crear_retos_view, name='crear_retos'),
+    path('jefe/asignar-mentores-admin/', views.asignar_mentores_admin_view, name='asignar_mentores_admin'),
+    path('jefe/asignar-vigilantes-admin/', views.asignar_vigilantes_admin_view, name='asignar_vigilantes_admin'),
+    
     # API
     path('api/notifications/check/', views.check_notifications_api, name='check_notifications'),
     path('api/monitor/tributos/', views.monitor_tributos_api, name='monitor_tributos'),

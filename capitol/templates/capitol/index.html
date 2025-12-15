@@ -2,6 +2,14 @@
 
 {% load static %}
 
+{% block header_title %}Coding Games{% endblock %}
+{% block header_subtitle %}¡Prepárate para demostrar tus habilidades en nuestra competencia anual de programación!{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'login' %}" class="nav-btn">Ingreso a la Arena</a>
+    <a href="{% url 'login' %}" class="nav-btn">Ingreso al Capitolio</a>
+{% endblock %}
+
 {% block content %}
     <div class="carousel">
         <div class="carousel-images">
@@ -9,48 +17,180 @@
             <img src="{% static 'images/code_camp_4.jpg' %}" alt="Slide 2">
             <img src="{% static 'images/code_camp_3.jpg' %}" alt="Slide 3">
             <img src="{% static 'images/capitol_maker.jpg' %}" alt="Slide 4">
-
-            <!-- Agrega más imágenes según sea necesario -->
+            <!-- Duplicamos las imágenes para loop infinito -->
+            <img src="{% static 'images/code_camp_1.jpg' %}" alt="Slide 1">
+            <img src="{% static 'images/code_camp_4.jpg' %}" alt="Slide 2">
+            <img src="{% static 'images/code_camp_3.jpg' %}" alt="Slide 3">
+            <img src="{% static 'images/capitol_maker.jpg' %}" alt="Slide 4">
         </div>
-        <button class="carousel-button prev" onclick="moveSlide(-1)">&#10094;</button>
-        <button class="carousel-button next" onclick="moveSlide(1)">&#10095;</button>
-    </div>
-
-    <div class="welcome-container">
-        <h2>Bienvenido a The Coding Games</h2>
-        <p>¡Prepárate para demostrar tus habilidades en nuestra competencia anual de programación!</p>
-        <p>Elige tus desafíos y compite con tus compañeros para convertirte en el mejor programador.</p>
-        <a href="{% url 'login' %}" class="btn">Entrar en la Arena</a>
+        <button class="carousel-button prev" onclick="prevSlide()">&#10094;</button>
+        <button class="carousel-button next" onclick="nextSlide()">&#10095;</button>
     </div>
 {% endblock %}
 
 {% block extra_styles %}
-    <link rel="stylesheet" href="{% static 'capitol/css/index_styles.css' %}">   
+    <link rel="stylesheet" href="{% static 'capitol/css/index_styles.css' %}">
+    <style>
+        /* Elimina scroll en la página de inicio */
+        body {
+            overflow: hidden;
+            height: 100vh;
+        }
+        main {
+            height: calc(100vh - 140px);
+            overflow: hidden;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 5;
+        }
+        
+        /* Estilos específicos para el header de inicio */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 30px;
+            gap: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .logo a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+        
+        .title {
+            flex: 1;
+            text-align: center;
+            margin: 0;
+        }
+        
+        .title h1 {
+            font-size: 2.2em;
+            margin: 0;
+            margin-bottom: 5px;
+        }
+        
+        .title .subtitle {
+            font-size: 0.95em;
+            margin: 0;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            align-items: center;
+        }
+        
+        .nav-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85em;
+            padding: 8px 75em;
+            padding: 6px 166px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background-color: rgba(212, 175, 55, 0.1);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .nav-btn:hover {
+            background-color: rgba(212, 175, 55, 0.3);
+            border-color: #d4af37;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+    </style>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
     let index = 0;
+    const carouselImages = document.querySelector('.carousel-images');
     const slides = document.querySelectorAll('.carousel-images img');
-    const totalSlides = slides.length;
+    const totalSlides = slides.length / 2; // La mitad porque están duplicadas
+    let isTransitioning = false;
 
     function moveSlide() {
-        index = (index + 1) % totalSlides;
+        if (isTransitioning) return;
+        
+        isTransitioning = true;
+        index++;
+        
         const offset = -index * 100;
-        document.querySelector('.carousel-images').style.transform = `translateX(${offset}%)`;
+        carouselImages.style.transition = 'transform 0.5s ease-in-out';
+        carouselImages.style.transform = `translateX(${offset}%)`;
+        
+        // Cuando llegamos al final, reseteamos sin transición
+        if (index >= totalSlides) {
+            setTimeout(() => {
+                carouselImages.style.transition = 'none';
+                index = 0;
+                carouselImages.style.transform = 'translateX(0%)';
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 50);
+            }, 500);
+        } else {
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
     }
 
-    // Mueve el carrusel cada 3 segundos
-    setInterval(moveSlide, 3000); // Ajusta el tiempo según sea necesario
+    function nextSlide() {
+        moveSlide();
+    }
 
-    // Opcional: Agrega funcionalidad a los botones
-    document.querySelector('.prev').addEventListener('click', () => {
-        index = (index - 1 + totalSlides) % totalSlides;
-        const offset = -index * 100;
-        document.querySelector('.carousel-images').style.transform = `translateX(${offset}%)`;
-    });
+    function prevSlide() {
+        if (isTransitioning) return;
+        
+        isTransitioning = true;
+        
+        if (index === 0) {
+            carouselImages.style.transition = 'none';
+            index = totalSlides;
+            carouselImages.style.transform = `translateX(${-index * 100}%)`;
+            
+            setTimeout(() => {
+                index--;
+                carouselImages.style.transition = 'transform 0.5s ease-in-out';
+                carouselImages.style.transform = `translateX(${-index * 100}%)`;
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 500);
+            }, 50);
+        } else {
+            index--;
+            carouselImages.style.transform = `translateX(${-index * 100}%)`;
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+    }
 
-    document.querySelector('.next').addEventListener('click', () => moveSlide());
-</script>
+    // Auto-advance cada 3 segundos
+    setInterval(moveSlide, 3000);
 </script>
 {% endblock %}

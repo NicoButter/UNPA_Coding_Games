@@ -494,3 +494,75 @@ def monitor_tributos_api(request):
         'tributos': tributos_data,
         'timestamp': timezone.now().isoformat()
     })
+
+
+# Vistas de Administración Personalizada para Jefe del Capitolio
+
+@login_required
+def admin_jefe_view(request):
+    """
+    Panel de administración personalizado para Jefe del Capitolio
+    """
+    if request.user.rol != 'jefe_capitolio':
+        return HttpResponseForbidden("Acceso denegado")
+    
+    context = {
+        'page_title': 'Administración del Capitolio',
+    }
+    return render(request, 'dashboards/admin/admin_jefe.html', context)
+
+
+@login_required
+def crear_torneo_view(request):
+    """
+    Vista para crear el torneo anual
+    """
+    if request.user.rol != 'jefe_capitolio':
+        return HttpResponseForbidden("Acceso denegado")
+    
+    context = {
+        'page_title': 'Crear Torneo Anual',
+    }
+    return render(request, 'dashboards/admin/crear_torneo.html', context)
+
+
+@login_required
+def crear_retos_view(request):
+    """
+    Vista para crear retos de competencia
+    """
+    if request.user.rol != 'jefe_capitolio':
+        return HttpResponseForbidden("Acceso denegado")
+    
+    context = {
+        'page_title': 'Crear Retos',
+    }
+    return render(request, 'dashboards/admin/crear_retos.html', context)
+
+
+@login_required
+def asignar_mentores_admin_view(request):
+    """
+    Vista para asignar mentores a distritos
+    """
+    if request.user.rol != 'jefe_capitolio':
+        return HttpResponseForbidden("Acceso denegado")
+    
+    context = {
+        'page_title': 'Asignar Mentores por Distrito',
+    }
+    return render(request, 'dashboards/admin/asignar_mentores_admin.html', context)
+
+
+@login_required
+def asignar_vigilantes_admin_view(request):
+    """
+    Vista para asignar vigilantes
+    """
+    if request.user.rol != 'jefe_capitolio':
+        return HttpResponseForbidden("Acceso denegado")
+    
+    context = {
+        'page_title': 'Asignar Vigilantes',
+    }
+    return render(request, 'dashboards/admin/asignar_vigilantes_admin.html', context)

@@ -1,0 +1,191 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% load static %}
+
+{% block header_title %}🏆 Crear Torneo Anual{% endblock %}
+
+{% block dashboard_extra_styles %}
+    <link rel="stylesheet" href="{% static 'dashboards/css/jefe_capitolio_dashboard.css' %}">
+{% endblock %}
+
+{% block dashboard_nav %}
+    <a href="{% url 'dashboards:dashboard' %}" class="nav-link">📊 Resumen</a>
+    <a href="{% url 'dashboards:admin_jefe' %}" class="nav-link">⚙️ Panel Admin</a>
+    <a href="{% url 'dashboards:crear_torneo' %}" class="nav-link active">🏆 Crear Torneo</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="admin-form-container">
+    <div class="admin-form-card">
+        <h2>Crear Torneo Anual</h2>
+        <p class="subtitle">Configure los parámetros del torneo</p>
+        
+        <form method="POST" class="admin-form">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h3>Información del Torneo</h3>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre del Torneo:</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: The Coding Games 2025" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha_inicio">Fecha de Inicio:</label>
+                        <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha_fin">Fecha de Fin:</label>
+                        <input type="date" id="fecha_fin" name="fecha_fin" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" rows="4" placeholder="Describe el torneo..."></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Configuración</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="max_tributos">Máximo de Tributos:</label>
+                        <input type="number" id="max_tributos" name="max_tributos" min="1" value="24">
+                    </div>
+                    <div class="form-group">
+                        <label for="num_distritos">Número de Distritos:</label>
+                        <input type="number" id="num_distritos" name="num_distritos" min="1" value="12">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{% url 'dashboards:admin_jefe' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Crear Torneo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .admin-form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px 0;
+    }
+
+    .admin-form-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: 8px;
+        padding: 30px;
+    }
+
+    .admin-form-card h2 {
+        color: #d4af37;
+        margin: 0 0 5px 0;
+        font-size: 1.8em;
+    }
+
+    .admin-form-card .subtitle {
+        color: #c0c0c0;
+        margin: 0 0 30px 0;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section h3 {
+        color: #d4af37;
+        font-size: 1.2em;
+        margin: 0 0 20px 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #e8e4d9;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: #e8e4d9;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1em;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #d4af37;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 6px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #d4af37, #b8940a);
+        color: #0a0a0a;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-secondary {
+        background: rgba(212, 175, 55, 0.1);
+        color: #d4af37;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(212, 175, 55, 0.2);
+        border-color: #d4af37;
+    }
+</style>
+{% endblock %}
