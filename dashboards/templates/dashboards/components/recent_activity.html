@@ -3,21 +3,23 @@ Componente: Actividad reciente
 Uso: {% include 'dashboards/components/recent_activity.html' with activities=activity_list %}
 {% endcomment %}
 
-<div class="activity-panel">
-    <h3 class="panel-title">📋 Actividad Reciente</h3>
-    <div class="activity-list">
+<div class="dashboard-card">
+    <h3>📋 Actividad Reciente</h3>
+    <div class="notifications-list">
         {% if activities %}
             {% for activity in activities %}
-                <div class="activity-item">
-                    <div class="activity-icon">{{ activity.icon|default:'•' }}</div>
-                    <div class="activity-content">
-                        <p class="activity-text">{{ activity.text }}</p>
-                        <span class="activity-time">{{ activity.timestamp|timesince }} atrás</span>
+                <div class="notification-item">
+                    <div class="notification-icon">{{ activity.icon|default:'📌' }}</div>
+                    <div class="notification-content">
+                        <p>{{ activity.text }}</p>
+                        <span class="time">{{ activity.timestamp|timesince }} atrás</span>
                     </div>
                 </div>
+            {% empty %}
+                <p style="color: var(--capitol-silver); text-align: center; padding: 20px;">No hay actividad reciente</p>
             {% endfor %}
         {% else %}
-            <p class="no-activity">No hay actividad reciente</p>
+            <p style="color: var(--capitol-silver); text-align: center; padding: 20px;">No hay actividad reciente</p>
         {% endif %}
     </div>
 </div>
