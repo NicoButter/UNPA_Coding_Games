@@ -5,3 +5,6 @@ psycopg2-binary==2.9.11
 python-decouple==3.8
 qrcode==8.2
 sqlparse==0.5.4
+
+# Sistema de Juez Automático
+docker==7.0.0

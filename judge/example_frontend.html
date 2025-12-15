@@ -1,0 +1,368 @@
+<!-- 
+  Ejemplo de formulario para enviar soluciones desde el dashboard del tributo
+  Este archivo debe integrarse en el template del dashboard de tributos
+  Ubicación sugerida: dashboards/templates/dashboards/tributo_dashboard.html
+-->
+
+<!-- Editor de código para enviar soluciones -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-code"></i>
+            Enviar Solución - {{ reto.titulo }}
+        </h5>
+    </div>
+    <div class="card-body">
+        <!-- Selector de lenguaje -->
+        <div class="form-group mb-3">
+            <label for="lenguaje-select">
+                <strong>Lenguaje de Programación:</strong>
+            </label>
+            <select id="lenguaje-select" class="form-control">
+                {% for lang in lenguajes_permitidos %}
+                    <option value="{{ lang }}">
+                        {% if lang == 'python' %}Python
+                        {% elif lang == 'java' %}Java
+                        {% elif lang == 'javascript' %}JavaScript
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Editor de código -->
+        <div class="form-group mb-3">
+            <label for="code-editor">
+                <strong>Tu Código:</strong>
+            </label>
+            <textarea 
+                id="code-editor" 
+                class="form-control font-monospace" 
+                rows="15"
+                placeholder="Escribe tu código aquí..."
+                style="font-family: 'Courier New', monospace; font-size: 14px;"
+            ></textarea>
+            <small class="form-text text-muted">
+                Tiempo límite: {{ reto.limite_tiempo }}s | 
+                Memoria límite: {{ reto.limite_memoria }}MB
+            </small>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-flex gap-2">
+            <button 
+                id="btn-enviar" 
+                class="btn btn-success"
+                onclick="enviarSolucion()"
+            >
+                <i class="fas fa-paper-plane"></i>
+                Enviar Solución
+            </button>
+            <button 
+                id="btn-historial" 
+                class="btn btn-info"
+                onclick="verHistorial()"
+            >
+                <i class="fas fa-history"></i>
+                Ver Historial
+            </button>
+            <button 
+                class="btn btn-secondary"
+                onclick="limpiarEditor()"
+            >
+                <i class="fas fa-eraser"></i>
+                Limpiar
+            </button>
+        </div>
+
+        <!-- Área de resultados -->
+        <div id="resultado-area" class="mt-4" style="display: none;">
+            <hr>
+            <h6>Resultado de la Evaluación:</h6>
+            <div id="resultado-contenido"></div>
+        </div>
+
+        <!-- Modal de historial -->
+        <div id="historial-area" class="mt-4" style="display: none;">
+            <hr>
+            <h6>Historial de Submissions:</h6>
+            <div id="historial-contenido"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Plantillas de código inicial por lenguaje -->
+<script id="template-python" type="text/template">
+# Implementa tu solución aquí
+def suma(a, b):
+    # Tu código
+    pass
+</script>
+
+<script id="template-java" type="text/template">
+// Implementa tu solución aquí
+class Solution {
+    public static String solve(String input) {
+        // Tu código
+        return "";
+    }
+}
+</script>
+
+<script id="template-javascript" type="text/template">
+// Implementa tu solución aquí
+function suma(a, b) {
+    // Tu código
+}
+</script>
+
+<style>
+/* Estilos para los resultados */
+.veredicto-badge {
+    font-size: 1.1em;
+    padding: 8px 16px;
+}
+
+.veredicto-AC { background-color: #28a745; color: white; }
+.veredicto-WA { background-color: #dc3545; color: white; }
+.veredicto-TLE { background-color: #fd7e14; color: white; }
+.veredicto-MLE { background-color: #fd7e14; color: white; }
+.veredicto-RE { background-color: #dc3545; color: white; }
+.veredicto-CE { background-color: #6c757d; color: white; }
+.veredicto-SE { background-color: #6c757d; color: white; }
+.veredicto-PE { background-color: #ffc107; color: black; }
+
+.progress-custom {
+    height: 30px;
+    font-size: 14px;
+}
+</style>
+
+<script>
+// Variables globales
+const RETO_ID = {{ reto.id }};
+const editor = document.getElementById('code-editor');
+const lenguajeSelect = document.getElementById('lenguaje-select');
+const btnEnviar = document.getElementById('btn-enviar');
+const resultadoArea = document.getElementById('resultado-area');
+const resultadoContenido = document.getElementById('resultado-contenido');
+const historialArea = document.getElementById('historial-area');
+const historialContenido = document.getElementById('historial-contenido');
+
+// Cargar plantilla inicial al cambiar lenguaje
+lenguajeSelect.addEventListener('change', function() {
+    const lenguaje = this.value;
+    const template = document.getElementById(`template-${lenguaje}`);
+    if (template && editor.value.trim() === '') {
+        editor.value = template.textContent.trim();
+    }
+});
+
+// Cargar plantilla inicial
+window.addEventListener('load', function() {
+    lenguajeSelect.dispatchEvent(new Event('change'));
+});
+
+// Función para obtener CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Enviar solución
+async function enviarSolucion() {
+    const codigo = editor.value.trim();
+    const lenguaje = lenguajeSelect.value;
+
+    if (!codigo) {
+        alert('Por favor, escribe tu código antes de enviar.');
+        return;
+    }
+
+    // Deshabilitar botón
+    btnEnviar.disabled = true;
+    btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Evaluando...';
+
+    // Preparar datos
+    const formData = new FormData();
+    formData.append('codigo', codigo);
+    formData.append('lenguaje', lenguaje);
+
+    try {
+        const response = await fetch(`/judge/submit/${RETO_ID}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            mostrarResultado(data);
+        } else {
+            mostrarError(data.error || 'Error desconocido');
+        }
+    } catch (error) {
+        mostrarError('Error de conexión: ' + error.message);
+    } finally {
+        // Rehabilitar botón
+        btnEnviar.disabled = false;
+        btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solución';
+    }
+}
+
+// Mostrar resultado
+function mostrarResultado(data) {
+    const porcentaje = data.porcentaje_exito || 0;
+    const veredictoClass = `veredicto-${data.veredicto_code}`;
+    
+    let html = `
+        <div class="alert alert-${data.es_aceptado ? 'success' : 'warning'}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">
+                    <span class="badge ${veredictoClass} veredicto-badge">
+                        ${data.veredicto}
+                    </span>
+                </h5>
+                <h4 class="mb-0 text-primary">${data.puntos_obtenidos} puntos</h4>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Tests pasados:</strong> 
+                    ${data.casos_pasados} / ${data.casos_totales}
+                </div>
+                <div class="col-md-6">
+                    <strong>Tiempo:</strong> 
+                    ${(data.tiempo_ejecucion || 0).toFixed(3)}s
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <div class="progress progress-custom">
+                    <div 
+                        class="progress-bar ${data.es_aceptado ? 'bg-success' : 'bg-warning'}" 
+                        role="progressbar" 
+                        style="width: ${porcentaje}%"
+                        aria-valuenow="${porcentaje}" 
+                        aria-valuemin="0" 
+                        aria-valuemax="100"
+                    >
+                        ${porcentaje.toFixed(0)}%
+                    </div>
+                </div>
+            </div>
+    `;
+
+    if (data.error_message) {
+        html += `
+            <div class="mt-3">
+                <strong>Error:</strong>
+                <pre class="bg-light p-2 rounded">${escapeHtml(data.error_message)}</pre>
+            </div>
+        `;
+    }
+
+    html += '</div>';
+
+    resultadoContenido.innerHTML = html;
+    resultadoArea.style.display = 'block';
+    historialArea.style.display = 'none';
+
+    // Scroll al resultado
+    resultadoArea.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Mostrar error
+function mostrarError(mensaje) {
+    resultadoContenido.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Error:</strong> ${escapeHtml(mensaje)}
+        </div>
+    `;
+    resultadoArea.style.display = 'block';
+    historialArea.style.display = 'none';
+}
+
+// Ver historial
+async function verHistorial() {
+    historialContenido.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando historial...';
+    historialArea.style.display = 'block';
+    resultadoArea.style.display = 'none';
+
+    try {
+        const response = await fetch(`/judge/history/${RETO_ID}/`);
+        const data = await response.json();
+
+        if (data.submissions && data.submissions.length > 0) {
+            let html = '<div class="table-responsive"><table class="table table-sm table-hover">';
+            html += '<thead><tr>';
+            html += '<th>#</th>';
+            html += '<th>Veredicto</th>';
+            html += '<th>Puntos</th>';
+            html += '<th>Tests</th>';
+            html += '<th>Tiempo</th>';
+            html += '<th>Lenguaje</th>';
+            html += '<th>Fecha</th>';
+            html += '</tr></thead><tbody>';
+
+            data.submissions.forEach((sub, idx) => {
+                const fecha = new Date(sub.fecha).toLocaleString();
+                const veredictoClass = `veredicto-${sub.veredicto_code}`;
+                
+                html += `<tr>`;
+                html += `<td>${idx + 1}</td>`;
+                html += `<td><span class="badge ${veredictoClass}">${sub.veredicto}</span></td>`;
+                html += `<td>${sub.puntos}</td>`;
+                html += `<td>${sub.casos_pasados}/${sub.casos_totales}</td>`;
+                html += `<td>${(sub.tiempo || 0).toFixed(3)}s</td>`;
+                html += `<td>${sub.lenguaje}</td>`;
+                html += `<td><small>${fecha}</small></td>`;
+                html += `</tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            historialContenido.innerHTML = html;
+        } else {
+            historialContenido.innerHTML = `
+                <div class="alert alert-info">
+                    No has enviado soluciones para este reto aún.
+                </div>
+            `;
+        }
+    } catch (error) {
+        historialContenido.innerHTML = `
+            <div class="alert alert-danger">
+                Error cargando historial: ${escapeHtml(error.message)}
+            </div>
+        `;
+    }
+}
+
+// Limpiar editor
+function limpiarEditor() {
+    if (confirm('¿Estás seguro de limpiar el editor?')) {
+        lenguajeSelect.dispatchEvent(new Event('change'));
+    }
+}
+
+// Escapar HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>

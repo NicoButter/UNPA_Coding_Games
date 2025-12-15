@@ -52,8 +52,8 @@ class CasoDePruebaInline(admin.TabularInline):
 
 @admin.register(Reto)
 class RetoAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'torneo', 'dificultad', 'tipo', 'puntos_base', 'fecha_publicacion', 'is_activo']
-    list_filter = ['dificultad', 'tipo', 'is_activo', 'tiene_validacion_automatica']
+    list_display = ['titulo', 'torneo', 'dificultad', 'tipo', 'puntos_base', 'tiene_validacion_automatica', 'fecha_publicacion', 'is_activo']
+    list_filter = ['dificultad', 'tipo', 'is_activo', 'tiene_validacion_automatica', 'torneo']
     search_fields = ['titulo', 'descripcion']
     date_hierarchy = 'fecha_publicacion'
     readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
@@ -72,8 +72,13 @@ class RetoAdmin(admin.ModelAdmin):
         ('Fechas', {
             'fields': ('fecha_publicacion', 'fecha_limite')
         }),
-        ('Configuración', {
-            'fields': ('is_activo', 'is_visible', 'tiene_validacion_automatica', 'lenguajes_permitidos', 'archivo_datos')
+        ('Configuración Básica', {
+            'fields': ('is_activo', 'is_visible', 'archivo_datos')
+        }),
+        ('⚙️ Sistema de Juez Automático', {
+            'fields': ('tiene_validacion_automatica', 'lenguajes_permitidos', 'tests_ocultos', 'limite_tiempo', 'limite_memoria'),
+            'description': '⚠️ IMPORTANTE: Los tests_ocultos NUNCA serán visibles para tributos. Solo para evaluación automática.',
+            'classes': ('wide',)
         }),
         ('Meta Información', {
             'fields': ('creado_por', 'fecha_creacion', 'fecha_actualizacion'),

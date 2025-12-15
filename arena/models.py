@@ -154,6 +154,26 @@ class Reto(models.Model):
         help_text='Lenguajes permitidos separados por comas'
     )
     
+    # Configuración del juez automático
+    tests_ocultos = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name='Tests Ocultos',
+        help_text='Tests por lenguaje. Formato: {"python": [...], "java": [...], "javascript": [...]}'
+    )
+    limite_tiempo = models.FloatField(
+        default=5.0,
+        validators=[MinValueValidator(0.1)],
+        verbose_name='Límite de Tiempo (segundos)',
+        help_text='Tiempo máximo de ejecución por test'
+    )
+    limite_memoria = models.IntegerField(
+        default=256,
+        validators=[MinValueValidator(64)],
+        verbose_name='Límite de Memoria (MB)',
+        help_text='Memoria máxima permitida para la ejecución'
+    )
+    
     # Meta información
     creado_por = models.ForeignKey(Personaje, on_delete=models.SET_NULL, null=True, related_name='retos_creados')
     fecha_creacion = models.DateTimeField(auto_now_add=True)

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "centro_control",
     "dashboards",
     "arena",
+    "judge",
 ]
 
 MIDDLEWARE = [

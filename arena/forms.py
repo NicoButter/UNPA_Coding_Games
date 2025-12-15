@@ -43,6 +43,7 @@ class RetoForm(forms.ModelForm):
             'fecha_publicacion', 'fecha_limite',
             'is_activo', 'is_visible',
             'tiene_validacion_automatica', 'lenguajes_permitidos',
+            'tests_ocultos', 'limite_tiempo', 'limite_memoria',
             'archivo_datos'
         ]
         widgets = {
@@ -61,7 +62,29 @@ class RetoForm(forms.ModelForm):
             'is_visible': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'tiene_validacion_automatica': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'lenguajes_permitidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'python,javascript,java'}),
+            'tests_ocultos': forms.Textarea(attrs={
+                'class': 'form-control font-monospace',
+                'rows': 12,
+                'placeholder': '{"python": [{"name": "Test 1", "function_call": {"name": "funcion", "args": [2, 3]}, "expected": "5"}]}',
+                'style': 'font-family: monospace; font-size: 13px;'
+            }),
+            'limite_tiempo': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '5.0',
+                'step': '0.1',
+                'min': '0.1'
+            }),
+            'limite_memoria': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': '256',
+                'min': '64'
+            }),
             'archivo_datos': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+        help_texts = {
+            'tests_ocultos': 'Tests ocultos en formato JSON por lenguaje. NUNCA serán visibles para tributos.',
+            'limite_tiempo': 'Tiempo máximo de ejecución en segundos (ej: 5.0)',
+            'limite_memoria': 'Memoria máxima en MB (ej: 256)',
         }
 
 

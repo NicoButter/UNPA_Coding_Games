@@ -26,6 +26,7 @@ urlpatterns = [
     path('centro_control/', include('centro_control.urls', namespace='centro_control')),
     path('dashboard/', include('dashboards.urls', namespace='dashboards')),
     path('arena/', include('arena.urls', namespace='arena')),
+    path('judge/', include('judge.urls', namespace='judge')),
 ]
 
 # Servir archivos media en desarrollo
