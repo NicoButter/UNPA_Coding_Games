@@ -20,12 +20,8 @@
     --neutral: #95a5a6;
 }
 
-/* Base Dashboard */
-.dashboard-container {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-    min-height: 100vh;
-    padding: 20px;
-}
+/* Dashboard Container - Sin cambios, heredado de base */
+/* El contenedor ya tiene los estilos correctos en dashboard_styles.css */
 
 /* Cards con efecto elegante */
 .dashboard-card {

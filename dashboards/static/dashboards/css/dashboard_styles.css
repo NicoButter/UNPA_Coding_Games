@@ -10,11 +10,19 @@
     --capitol-purple: #6b3b6b;
 }
 
-/* Dashboard Container */
-.dashboard-container {
+/* Dashboard Wrapper - Contenedor exterior */
+.dashboard-wrapper {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dashboard Container - Contenedor interno */
+.dashboard-container {
+    flex: 1;
     padding: 20px;
+    overflow-y: auto;
 }
 
 /* Dashboard Header */
@@ -23,12 +31,15 @@
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(107, 59, 107, 0.05) 100%);
-    border: 2px solid rgba(212, 175, 55, 0.3);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 30px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    padding: 24px 40px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+}
+
+.dashboard-title {
+    flex: 1;
+    text-align: center;
 }
 
 .dashboard-title h1 {
@@ -145,5 +156,58 @@
     .stats-grid,
     .stats-container {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Dashboard Navigation */
+.dashboard-nav {
+    background: linear-gradient(90deg, rgba(107, 59, 107, 0.1), rgba(212, 175, 55, 0.08));
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    gap: 0;
+}
+
+.dashboard-nav a,
+.dashboard-nav button {
+    padding: 16px 24px;
+    color: var(--capitol-light);
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.dashboard-nav a:hover,
+.dashboard-nav button:hover {
+    color: var(--capitol-gold);
+    border-bottom-color: var(--capitol-gold);
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.dashboard-nav a.active,
+.dashboard-nav button.active {
+    color: var(--capitol-gold);
+    border-bottom-color: var(--capitol-gold);
+    background: rgba(212, 175, 55, 0.15);
+}
+
+/* Responsive - Hide nav on very small screens */
+@media (max-width: 480px) {
+    .dashboard-nav {
+        padding: 8px 16px;
+        gap: 8px;
+    }
+    
+    .dashboard-nav a,
+    .dashboard-nav button {
+        padding: 8px 12px;
+        font-size: 0.9em;
     }
 }

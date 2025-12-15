@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
+<div class="dashboard-wrapper">
     <!-- Header del Dashboard -->
     <div class="dashboard-header">
         <div class="dashboard-title">
@@ -29,19 +29,27 @@
         </div>
     </div>
 
-    <!-- Estadísticas principales -->
-    <div class="stats-container">
-        {% block dashboard_stats %}{% endblock %}
-    </div>
+    <!-- Navegación de Acciones Rápidas -->
+    <nav class="dashboard-nav">
+        {% block dashboard_nav %}{% endblock %}
+    </nav>
 
-    <!-- Contenido principal del dashboard -->
-    <div class="dashboard-content">
-        {% block dashboard_content %}{% endblock %}
-    </div>
+    <!-- Contenedor principal del dashboard -->
+    <div class="dashboard-container">
+        <!-- Estadísticas principales -->
+        <div class="stats-container">
+            {% block dashboard_stats %}{% endblock %}
+        </div>
 
-    <!-- Acciones rápidas -->
-    <div class="quick-actions">
-        {% block dashboard_actions %}{% endblock %}
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
+            {% block dashboard_content %}{% endblock %}
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="quick-actions">
+            {% block dashboard_actions %}{% endblock %}
+        </div>
     </div>
 </div>
 {% endblock %}

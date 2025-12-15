@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="{% static 'dashboards/css/jefe_capitolio_dashboard.css' %}">
 {% endblock %}
 
+{% block dashboard_nav %}
+    <a href="#resumen" class="nav-link active">📊 Resumen</a>
+    <a href="#distritos" class="nav-link">🏛️ Distritos</a>
+    <a href="#competencias" class="nav-link">🎮 Competencias</a>
+    <a href="#usuarios" class="nav-link">👥 Usuarios</a>
+    <a href="#reportes" class="nav-link">📈 Reportes</a>
+    <a href="{% url 'admin:index' %}" class="nav-link">⚙️ Administración</a>
+{% endblock %}
+
 {% block dashboard_stats %}
     {% include 'dashboards/components/stats_card.html' with title="Total Tributos" value=stats.total_tributos icon="👥" %}
     {% include 'dashboards/components/stats_card.html' with title="Competencias Activas" value=stats.competencias_activas icon="🎮" color="info" %}

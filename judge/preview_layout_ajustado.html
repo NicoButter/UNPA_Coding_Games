@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview - Jefe del Capitolio Dashboard - Layout Ajustado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Raleway", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 300;
+            font-style: normal;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: #fff;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .title .subtitle {
+            margin: 5px 0 0 0;
+            font-size: 0.9em;
+            color: #c0c0c0;
+            font-style: italic;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.95em;
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background-color: rgba(212, 175, 55, 0.1);
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(212, 175, 55, 0.3);
+            border-color: #d4af37;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        /* Dashboard Wrapper */
+        .dashboard-wrapper {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(107, 59, 107, 0.05) 100%);
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+            padding: 24px 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.15);
+        }
+
+        .dashboard-title h1 {
+            color: #d4af37;
+            font-size: 2em;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        }
+
+        .dashboard-title .subtitle {
+            color: #c0c0c0;
+            margin: 0;
+            font-style: italic;
+            font-size: 0.95em;
+        }
+
+        .dashboard-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .content-area {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            color: #e8e4d9;
+            line-height: 1.6;
+        }
+
+        .content-area h2 {
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+
+        .demo-box {
+            background: rgba(212, 175, 55, 0.1);
+            border-left: 4px solid #d4af37;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+            color: #c0c0c0;
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* Margin/Padding Visualizer */
+        .info-banner {
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid #d4af37;
+            padding: 15px 20px;
+            margin: 10px 20px;
+            border-radius: 6px;
+            color: #e8e4d9;
+            font-size: 0.9em;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .status-indicator.warning {
+            background: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-container">
+            <div class="title">
+                <h1>🔥 Coding Games 🔥</h1>
+                <p class="subtitle">Hunger Games de Programación - UNPA</p>
+            </div>
+            <nav class="nav-links">
+                <a href="#">👤 Perfil</a>
+                <a href="#">📊 Dashboard</a>
+                <a href="#">⚙️ Admin</a>
+                <a href="#">🚪 Salir</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT - NOW WITH 0 PADDING -->
+    <main>
+        <div class="dashboard-wrapper">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="dashboard-title">
+                    <h1>Jefe del Capitolio</h1>
+                    <p class="subtitle">Panel de Control - Administración de Juegos</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Container -->
+            <div class="dashboard-container">
+                <div class="info-banner">
+                    ✅ <strong>Layout Verificado:</strong> 
+                    Main sin padding/margin | Dashboard ancho 100% | Sin espacios en blanco
+                </div>
+
+                <div class="content-area">
+                    <h2>📊 Resumen del Dashboard</h2>
+                    
+                    <div class="demo-box">
+                        <strong>✓ Main Element</strong>
+                        <p>padding: 0 | margin: 0 | width: 100%</p>
+                    </div>
+
+                    <div class="demo-box">
+                        <strong>✓ Dashboard Wrapper</strong>
+                        <p>width: 100% | background: gradient | min-height: calc(100vh - 200px)</p>
+                    </div>
+
+                    <div class="demo-box">
+                        <strong>✓ Dashboard Container</strong>
+                        <p>padding: 20px | overflow-y: auto | flex: 1</p>
+                    </div>
+
+                    <h2 style="margin-top: 30px;">🎨 Cambios de Navbar</h2>
+                    <div class="demo-box">
+                        <strong>Botones Mejorados:</strong>
+                        <p>• Background: rgba(212, 175, 55, 0.1) siempre visible</p>
+                        <p>• Hover: Elevación + Box-shadow dorado</p>
+                        <p>• Emojis: 👤 📊 ⚙️ 🚪</p>
+                        <p>• Border: 2px sólido al pasar mouse</p>
+                    </div>
+
+                    <h2 style="margin-top: 30px;">📐 Espaciado Final</h2>
+                    <div class="demo-box">
+                        <strong>Estructura Verticalmente:</strong>
+                        <p>Header (15px padding) → Main (0px padding) → Dashboard (100% width) → Footer</p>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #c0c0c0; font-style: italic;">
+                        El dashboard ahora ocupa todo el espacio disponible sin espacios en blanco laterales.
+                        El contenido está correctamente espaciado en el interior del dashboard-container.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024-2025 UNPA - The Coding Games | "Que los odds estén siempre a tu favor"</p>
+    </footer>
+</body>
+</html>

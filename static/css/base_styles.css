@@ -61,39 +61,53 @@ header {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
 }
 
 .nav-links a {
     color: #fff;
     text-decoration: none;
-    font-size: 1em;
-    padding: 8px 15px;
-    border-radius: 5px;
-    transition: all 0.3s;
-    border: 1px solid transparent;
+    font-size: 0.95em;
+    padding: 10px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-color: rgba(212, 175, 55, 0.1);
+    font-weight: 500;
 }
 
 .nav-links a:hover {
-    background-color: rgba(212, 175, 55, 0.2);
+    background-color: rgba(212, 175, 55, 0.3);
     border-color: #d4af37;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
 
 /* Estilos del contenido principal */
 main {
     flex: 1;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 0;
+    margin: 0;
     width: 100%;
     box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Dashboard wrapper ocupa todo sin espacios */
+main > .dashboard-wrapper {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: auto;
+    min-height: calc(100vh - 200px);
 }
 
 /* Sistema de mensajes */
 .messages-container {
-    max-width: 800px;
-    margin: 20px auto;
+    max-width: 100%;
+    margin: 0;
+    padding: 20px;
 }
 
 .alert {
@@ -167,4 +181,9 @@ footer {
 footer p {
     margin: 0;
     font-size: 0.9em;
+}
+/* Estilos para dashboards - sin padding en main */
+main .dashboard-wrapper {
+    margin: 0;
+    padding: 0;
 }
