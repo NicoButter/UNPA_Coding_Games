@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block header_title %}Ingreso a la Arena{% endblock %}
+{% block header_title %}Ingreso al Capitolio{% endblock %}
 {% block header_subtitle %}{% endblock %}
 
-{% block nav_links %}
-    <a href="{% url 'register' %}" class="nav-links-btn">Acreditarse como Tributo</a>
-{% endblock %}
+{% block nav_links %}{% endblock %}
 
 {% block extra_styles %}
     <link rel="stylesheet" href="{% static 'capitol/css/login_styles.css' %}">
@@ -15,12 +13,12 @@
 {% block content %}
 <div class="login-container">
     <div class="capitol-seal">
-        <h1 class="capitol-title">EL CAPITOLIO</h1>
-        <p class="capitol-subtitle">Portal de Acceso - Hunger Games de Código</p>
+        <h1 class="capitol-title">INGRESO AL CAPITOLIO</h1>
+        <p class="capitol-subtitle">Portal de Acceso para Docentes - Hunger Games de Código</p>
     </div>
     
     <div class="login-card">
-        <h2 class="form-title">Ingresar a la Arena</h2>
+        <h2 class="form-title">Acceso Docentes y Mentores</h2>
         
         {% if messages %}
             <div class="messages">
@@ -62,14 +60,13 @@
             {% endif %}
             
             <button type="submit" class="btn-submit">
-                Iniciar Sesión
+                Acceder al Capitolio
             </button>
         </form>
         
         <div class="login-footer">
-            <p>¿No tienes cuenta? <a href="{% url 'register' %}" class="link-register">Regístrate como tributo</a></p>
             <p class="disclaimer">
-                <small>Al ingresar aceptas participar en los Hunger Games de Código UNPA</small>
+                <small>Ingrese sus credenciales de docente o mentor para acceder al panel de control</small>
             </p>
         </div>
     </div>

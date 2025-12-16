@@ -35,6 +35,29 @@ def login_view(request):
 
     return render(request, 'capitol/login.html', {'form': form})
 
+def login_docente_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboards:dashboard')
+    
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            # Verificar que el usuario sea docente o jefe
+            if user.rol not in ['docente', 'jefe_capitolio', 'mentor']:
+                messages.error(request, 'Solo docentes pueden ingresar por aquí.')
+                return render(request, 'capitol/login_docente.html', {'form': form})
+            
+            login(request, user)
+            messages.success(request, f'¡Bienvenido, {user.get_full_name()}!')
+            return redirect('dashboards:dashboard')
+        else:
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+    else:
+        form = CustomAuthenticationForm()
+
+    return render(request, 'capitol/login_docente.html', {'form': form})
+
 def logout_view(request):
     logout(request)
     messages.info(request, 'Has cerrado sesión exitosamente.')

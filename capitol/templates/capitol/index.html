@@ -7,7 +7,7 @@
 
 {% block nav_links %}
     <a href="{% url 'login' %}" class="nav-btn">Ingreso a la Arena</a>
-    <a href="{% url 'login' %}" class="nav-btn">Ingreso al Capitolio</a>
+    <a href="{% url 'login_docente' %}" class="nav-btn">Ingreso al Capitolio</a>
 {% endblock %}
 
 {% block content %}
@@ -46,80 +46,6 @@
             bottom: 0;
             width: 100%;
             z-index: 5;
-        }
-        
-        /* Estilos específicos para el header de inicio */
-        .header-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 30px;
-            gap: 20px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        
-        .logo a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .logo img {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            object-fit: contain;
-        }
-        
-        .title {
-            flex: 1;
-            text-align: center;
-            margin: 0;
-        }
-        
-        .title h1 {
-            font-size: 2.2em;
-            margin: 0;
-            margin-bottom: 5px;
-        }
-        
-        .title .subtitle {
-            font-size: 0.95em;
-            margin: 0;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            flex-shrink: 0;
-            align-items: center;
-        }
-        
-        .nav-btn {
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.85em;
-            padding: 8px 75em;
-            padding: 6px 166px;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            background-color: rgba(212, 175, 55, 0.1);
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        
-        .nav-btn:hover {
-            background-color: rgba(212, 175, 55, 0.3);
-            border-color: #d4af37;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
         }
     </style>
 {% endblock %}
