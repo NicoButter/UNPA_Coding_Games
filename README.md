@@ -3,10 +3,20 @@
 [![Django Version](https://img.shields.io/badge/Django-5.0.14-green.svg)](https://djangoproject.com/)
 [![Python Version](https://img.shields.io/badge/Python-3.14+-blue.svg)](https://python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/Version-2.0-purple.svg)]()
 
 Sistema de competencia de programación inspirado en Los Juegos del Hambre para la Universidad Nacional de la Patagonia Austral (UNPA).
 
 > *En el Capitolio, el código es ley. En la arena, solo sobreviven los mejores programadores.* 🔥
+
+## 🆕 Novedades v2.0 (Diciembre 2025)
+
+- 🏆 **Gestión Avanzada de Torneos**: Períodos configurables (acreditación, competencia, premios)
+- 🏢 **Sistema de Distritos**: Gestión completa de unidades académicas
+- 👥 **Asignación de Mentores por Torneo**: Mentores asignados a distritos específicos
+- 👁️ **Roles de Vigilantes**: General, acreditación, competencia, premios
+- 📝 **Auditoría de Estados**: Registro completo de cambios en torneos
+- ✅ **9 Tests Automatizados**: Suite de pruebas para tournaments app
 
 ## 📋 Tabla de Contenidos
 
@@ -45,9 +55,22 @@ Plataforma web completa que simula un sistema de competencias de programación c
 - **Puntuación Dinámica**: Sistema de puntos basado en eficiencia y complejidad
 - **Rankings en Tiempo Real**: Clasificaciones por distrito y global
 
+### 🏆 Gestión Avanzada de Torneos (NEW v2.0)
+- **Períodos Configurables**: Acreditación, competencia y premios con fechas flexibles
+- **Eventos de Un Día**: Soporte para torneos donde todo ocurre el mismo día
+- **Estados de Torneo**: Planificación → Acreditación → Competencia → Premios → Finalizado
+- **Auditoría Completa**: Registro de todos los cambios de estado
+- **Asignación Masiva**: Asignar múltiples mentores/vigilantes de una vez
+
+### 🏢 Sistema de Distritos (NEW v2.0)
+- **Distritos = Unidades Académicas**: Representación clara de la estructura organizacional
+- **Colores Personalizables**: Identidad visual por distrito
+- **Membresía Flexible**: Usuarios pueden pertenecer a distritos
+- **Reutilización**: Los mismos distritos se usan en múltiples torneos
+
 ### 👥 Gestión Jerárquica de Roles
 - **4 Roles Distintos**: Tributo, Mentor, Vigilante, Jefe del Capitolio
-- **Asignaciones Dinámicas**: Mentores por unidad académica, Vigilantes por torneo
+- **Asignaciones Dinámicas**: Mentores por distrito/torneo, Vigilantes con roles específicos
 - **Permisos Granulares**: Control de acceso basado en roles
 
 ### 🎫 Sistema de Acreditación
@@ -109,12 +132,30 @@ UNPA_Coding_Games/
 │   ├── utils.py                  # Generación de credenciales PDF
 │   ├── templates/capitol/        # Login, registro, acreditación
 │   └── static/capitol/           # CSS, JS, imágenes
-├── 📂 arena/                      # 🏆 Gestión de torneos y retos
-│   ├── models.py                 # Torneo, Reto, Participacion, AyudaMentor, PresupuestoMentor
+├── 📂 arena/                      # 🏆 Gestión de retos y participación
+│   ├── models.py                 # Reto, Participacion, AyudaMentor, PresupuestoMentor
 │   ├── views.py                  # Arena, resolución de retos
 │   ├── patrocinio.py             # Lógica de sistema de ayudas
 │   ├── templates/arena/          # Arena, editor de código
 │   └── static/arena/             # CSS específico de arena
+├── 📂 districts/                  # 🏢 Gestión de distritos (NEW v2.0)
+│   ├── models.py                 # District, DistrictMembership
+│   ├── views.py                  # CRUD de distritos
+│   ├── admin.py                  # Admin personalizado
+│   └── migrations/               # Migraciones de BD
+├── 📂 tournaments/                # 🏆 Gestión avanzada de torneos (NEW v2.0)
+│   ├── models.py                 # Tournament, TournamentMentor, TournamentVigilante, TournamentStatus
+│   ├── views.py                  # CRUD torneos, asignaciones masivas
+│   ├── forms.py                  # Formularios y FormSets
+│   ├── admin.py                  # Admin con inlines
+│   ├── tests.py                  # 9 tests automatizados
+│   ├── templates/tournaments/    # 12 templates especializados
+│   └── migrations/               # Migraciones de BD
+├── 📂 judge/                      # ⚖️ Sistema de juez automático
+│   ├── models.py                 # Submission, TestCaseResult
+│   ├── runner.py                 # Ejecutor de código
+│   ├── docker_executor.py        # Ejecución segura en Docker
+│   └── templates/judge/          # Resultados de ejecución
 ├── 📂 dashboards/                 # 📊 Dashboards por rol
 │   ├── views.py                  # Dashboards y APIs REST
 │   ├── forms.py                  # Asignaciones, envío de ayudas
@@ -126,9 +167,13 @@ UNPA_Coding_Games/
 │   ├── settings.py               # Configuración Django
 │   ├── urls.py                   # URLs principales
 │   └── wsgi.py                   # WSGI para despliegue
-├── 📂 PSI/                        # 📋 Documentación
-│   ├── Especificacion_Requerimientos.md
-│   └── Casos_de_Uso.md
+├── 📂 docs/                       # 📚 Documentación técnica
+│   ├── TOURNAMENTS_ARQUITECTURA_FINAL.md
+│   ├── TOURNAMENTS_REFACTOR_DISTRICTS.md
+│   ├── JUDGE_SYSTEM.md
+│   └── ... (otros docs)
+├── 📂 PSI/                        # 📋 Documentación formal (ERS v2.0)
+│   └── Especificacion_Requerimientos.md
 ├── 📄 requirements.txt            # 📦 Dependencias Python
 ├── 📄 .env.example               # 🔐 Variables de entorno
 ├── 🐍 manage.py                  # Django CLI
@@ -142,12 +187,28 @@ graph TD
     A[Personaje] --> B[TributoInfo]
     A --> C[PresupuestoMentor]
     B --> D[AyudaMentor]
-    E[Torneo] --> F[Reto]
-    F --> G[CasoDePrueba]
-    F --> H[ParticipacionTributo]
-    E --> I[Vigilantes Asignados]
-    D --> J[Mentor]
+    
+    subgraph "Tournaments App (NEW v2.0)"
+        E2[Tournament] --> F2[TournamentMentor]
+        E2 --> G2[TournamentVigilante]
+        E2 --> H2[TournamentStatus]
+        F2 --> I2[District]
+    end
+    
+    subgraph "Districts App (NEW v2.0)"
+        I2[District] --> J2[DistrictMembership]
+        J2 --> A
+    end
+    
+    subgraph "Arena App"
+        E[Reto] --> F[CasoDePrueba]
+        E --> G[ParticipacionTributo]
+    end
+    
+    D --> A
     D --> B
+    F2 --> A
+    G2 --> A
 ```
 
 ## Tecnologías
@@ -309,9 +370,12 @@ Para envío de credenciales PDF:
 - ✅ Generar reportes de actividad
 
 #### 👑 Jefe del Capitolio (Administrador)
-- ✅ Crear y gestionar torneos completos
-- ✅ Asignar mentores a unidades académicas
-- ✅ Asignar vigilantes a torneos
+- ✅ Crear y gestionar torneos con períodos configurables
+- ✅ Asignar mentores a distritos por torneo
+- ✅ Asignar vigilantes con roles específicos (general, acreditación, competencia, premios)
+- ✅ Ver distritos sin mentor asignado
+- ✅ Asignación masiva de mentores y vigilantes
+- ✅ Auditoría completa de cambios de estado
 - ✅ Administrar todo el sistema
 
 ### 📊 Dashboards por Rol
@@ -354,9 +418,13 @@ GET /api/monitor/tributos/
 # Todos los tests
 python manage.py test
 
-# Tests específicos
+# Tests específicos por app
 python manage.py test capitol.tests
 python manage.py test arena.tests
+python manage.py test tournaments.tests  # 9 tests (NEW v2.0)
+
+# Con verbose
+python manage.py test tournaments -v 2
 
 # Con coverage
 coverage run manage.py test
@@ -559,20 +627,32 @@ copies or substantial portions of the Software.
 
 ## 🎯 Roadmap
 
-### ✅ Versión 1.0 (Actual)
+### ✅ Versión 1.0 (Diciembre 2025)
 - Sistema jerárquico completo
 - Acreditación QR
 - Sistema de patrocinio
 - Monitoreo en tiempo real
 - Notificaciones avanzadas
 
-### 🚧 Próximas Features
+### ✅ Versión 2.0 (Diciembre 2025) - ACTUAL
+- [x] **App Tournaments**: Gestión avanzada de torneos
+- [x] **Períodos Configurables**: Acreditación, competencia, premios
+- [x] **App Districts**: Gestión de distritos/unidades académicas
+- [x] **Asignación Mentores-Distritos**: Por torneo específico
+- [x] **Roles de Vigilantes**: General, acreditación, competencia, premios
+- [x] **Auditoría de Estados**: TournamentStatus con historial
+- [x] **9 Tests Automatizados**: Suite completa para tournaments
+- [x] **Documentación ERS v2.0**: Especificación actualizada
+
+### 🚧 Próximas Features (v3.0)
 - [ ] WebSockets para notificaciones en tiempo real
 - [ ] Sistema de chat mentor-tributo
 - [ ] Análisis de código con IA
-- [ ] Torneos en tiempo real
+- [ ] Torneos en tiempo real con countdown
 - [ ] Integración con jueces online (Codeforces, etc.)
 - [ ] App móvil complementaria
+- [ ] Dashboard de analytics avanzado
+- [ ] Sistema de logros y badges
 
 ---
 

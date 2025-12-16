@@ -8,8 +8,8 @@
 | Campo | Detalle |
 |-------|---------|
 | **Proyecto** | UNPA Coding Games |
-| **Versión** | 1.0 |
-| **Fecha** | 10 de Diciembre de 2025 |
+| **Versión** | 2.0 |
+| **Fecha** | 16 de Diciembre de 2025 |
 | **Autores** | Equipo de Desarrollo UNPA |
 | **Estado** | En Desarrollo |
 
@@ -26,7 +26,10 @@ Este documento especifica los requerimientos funcionales y no funcionales para e
 El sistema **UNPA Coding Games** permite:
 
 - Gestión jerárquica de roles (Jefe del Capitolio, Mentores, Vigilantes, Tributos)
-- Creación y gestión de torneos de programación
+- Creación y gestión avanzada de torneos de programación
+- **Administración de torneos con períodos configurables** (acreditación, competencia, premios)
+- **Asignación de mentores a distritos/unidades académicas por torneo**
+- **Asignación de vigilantes con roles específicos por torneo**
 - Sistema de acreditación mediante códigos QR
 - Resolución y validación automática de retos de programación
 - Sistema de patrocinio (ayudas de mentores a tributos)
@@ -44,6 +47,7 @@ El sistema **UNPA Coding Games** permite:
 | **Arena** | Espacio virtual donde se desarrollan las competencias |
 | **Reto** | Desafío de programación dentro de un torneo |
 | **Patrocinio** | Sistema de ayudas que los mentores envían a sus tributos |
+| **Distrito** | Unidad académica o grupo organizacional que participa en torneos |
 | **QR** | Código QR único para cada tributo usado en acreditación |
 | **UNPA** | Universidad Nacional de la Patagonia Austral |
 
@@ -77,22 +81,31 @@ UNPA Coding Games es una aplicación web independiente desarrollada con Django q
    - Acreditación mediante escaneo QR (webcam)
    - Envío automático de credenciales por email
 
-3. **Gestión de Torneos**
-   - Creación y configuración de torneos
-   - Asignación de retos a torneos
-   - Sistema de puntuación configurable
+3. **Gestión Avanzada de Torneos (NEW v2.0)**
+   - Creación de torneos con períodos configurables
+   - Fechas flexibles: acreditación, competencia y premios
+   - Soporte para eventos de un solo día
+   - Asignación de mentores a distritos por torneo
+   - Asignación de vigilantes con roles específicos
+   - Auditoría de cambios de estado
+   - Estados: planificación, acreditación, competencia, premios, finalizado
 
-4. **Arena de Competencia**
+4. **Gestión de Distritos**
+   - Distritos representan unidades académicas
+   - Colores personalizables por distrito
+   - Membresía de usuarios por distrito
+
+5. **Arena de Competencia**
    - Resolución de retos de programación
    - Validación automática con casos de prueba
    - Ejecución segura de código
 
-5. **Sistema de Patrocinio**
+6. **Sistema de Patrocinio**
    - Presupuesto de puntos para mentores
    - Envío de ayudas con costos diferenciados
    - Límites diarios de ayudas
 
-6. **Monitoreo en Tiempo Real**
+7. **Monitoreo en Tiempo Real**
    - Panel de vigilancia en vivo
    - Estadísticas actualizadas automáticamente
    - Notificaciones push
@@ -163,16 +176,39 @@ UNPA Coding Games es una aplicación web independiente desarrollada con Django q
 
 | ID | RF-03 |
 |----|-------|
-| **Nombre** | Administración de Torneos |
+| **Nombre** | Administración Avanzada de Torneos |
 | **Prioridad** | Alta |
-| **Descripción** | Creación, configuración y gestión de torneos de programación |
+| **Descripción** | Creación, configuración y gestión completa de torneos con períodos flexibles |
 
 **Casos de uso:**
-- **RF-03.1** Crear torneo con fechas y configuración
-- **RF-03.2** Asignar vigilantes a torneos
-- **RF-03.3** Configurar puntos mínimos para ganar
-- **RF-03.4** Gestionar estados del torneo (configuración, inscripción, en curso, finalizado)
-- **RF-03.5** Listar torneos disponibles para tributos acreditados
+- **RF-03.1** Crear torneo con nombre, descripción y número de edición
+- **RF-03.2** Configurar período de acreditación (fecha inicio y fin)
+- **RF-03.3** Configurar período de competencia (fecha inicio y fin)
+- **RF-03.4** Configurar fecha de entrega de premios
+- **RF-03.5** Permitir que todos los períodos sean el mismo día
+- **RF-03.6** Gestionar estados del torneo (planificación, acreditación, competencia, premios, finalizado, cancelado)
+- **RF-03.7** Asignar mentores a distritos específicos para el torneo
+- **RF-03.8** Asignar vigilantes con roles específicos (general, acreditación, competencia, premios)
+- **RF-03.9** Validar fechas coherentes (acreditación ≤ competencia ≤ premios)
+- **RF-03.10** Registrar auditoría de cambios de estado
+- **RF-03.11** Listar distritos sin mentor asignado
+- **RF-03.12** Asignación masiva de mentores a múltiples distritos
+- **RF-03.13** Asignación masiva de vigilantes a torneo
+
+#### **RF-03B: Gestión de Distritos**
+
+| ID | RF-03B |
+|----|-------|
+| **Nombre** | Administración de Distritos (Unidades Académicas) |
+| **Prioridad** | Media |
+| **Descripción** | Gestión de distritos/unidades académicas que participan en torneos |
+
+**Casos de uso:**
+- **RF-03B.1** Crear distrito con nombre, código y descripción
+- **RF-03B.2** Asignar colores personalizados al distrito
+- **RF-03B.3** Activar/desactivar distritos
+- **RF-03B.4** Gestionar membresía de usuarios por distrito
+- **RF-03B.5** Reutilizar distritos entre múltiples torneos
 
 #### **RF-04: Arena de Competencia**
 
@@ -434,6 +470,64 @@ UNPA Coding Games es una aplicación web independiente desarrollada con Django q
 
 ---
 
+### CU-06: Crear Torneo con Períodos
+
+**Actor Principal:** Jefe del Capitolio  
+**Precondiciones:** Usuario autenticado como Jefe del Capitolio  
+**Flujo Principal:**
+1. Jefe accede a "Crear Torneo" desde el dashboard
+2. Completa nombre, descripción y número de edición
+3. Configura fechas de acreditación (inicio y fin)
+4. Configura fechas de competencia (inicio y fin)
+5. Configura fecha de entrega de premios
+6. Sistema valida que las fechas sean coherentes
+7. Sistema permite mismo día para todos los períodos
+8. Sistema crea torneo en estado "planificación"
+9. Usuario es redirigido a detalle del torneo
+
+**Postcondiciones:** Torneo creado y listo para asignar personal
+
+---
+
+### CU-07: Asignar Mentor a Distrito en Torneo
+
+**Actor Principal:** Jefe del Capitolio  
+**Precondiciones:** Torneo creado, Distritos existentes  
+**Flujo Principal:**
+1. Jefe accede al detalle del torneo
+2. Sistema muestra distritos sin mentor asignado
+3. Jefe selecciona "Agregar Mentor"
+4. Selecciona mentor de lista (usuarios con rol mentor)
+5. Selecciona distrito de lista (distritos activos)
+6. Sistema valida que distrito no tenga mentor asignado
+7. Sistema crea asignación TournamentMentor
+8. Sistema muestra confirmación
+
+**Flujo Alternativo A:** Asignación masiva
+- A.1 Jefe selecciona múltiples mentores
+- A.2 Jefe selecciona múltiples distritos
+- A.3 Sistema distribuye mentores entre distritos
+
+**Postcondiciones:** Mentor asignado a distrito para el torneo específico
+
+---
+
+### CU-08: Asignar Vigilante con Rol a Torneo
+
+**Actor Principal:** Jefe del Capitolio  
+**Precondiciones:** Torneo creado  
+**Flujo Principal:**
+1. Jefe accede al detalle del torneo
+2. Selecciona "Agregar Vigilante"
+3. Selecciona vigilante de lista
+4. Selecciona rol: general, acreditación, competencia, o premios
+5. Sistema crea asignación TournamentVigilante
+6. Sistema muestra confirmación
+
+**Postcondiciones:** Vigilante asignado al torneo con rol específico
+
+---
+
 ## **5. MODELOS DE DATOS**
 
 ### 5.1 Diagrama Entidad-Relación (Textual)
@@ -451,6 +545,25 @@ Personaje (Usuario)
 ├─ distrito_asignado (solo mentores)
 └─ foto
 
+District (NEW v2.0)
+├─ id (PK)
+├─ name
+├─ code (unique)
+├─ description
+├─ color_primary
+├─ color_secondary
+├─ is_active (boolean)
+├─ created_at
+└─ updated_at
+
+DistrictMembership
+├─ id (PK)
+├─ district_id (FK → District)
+├─ user_id (FK → Personaje)
+├─ role: [member, leader, admin]
+├─ is_active
+└─ joined_at
+
 TributoInfo
 ├─ id (PK)
 ├─ personaje_id (FK → Personaje)
@@ -463,7 +576,53 @@ TributoInfo
 ├─ qr_token (UUID unique)
 └─ fecha_acreditacion
 
-Torneo
+Tournament (NEW v2.0)
+├─ id (PK)
+├─ nombre
+├─ descripcion
+├─ numero_edicion
+├─ fecha_acreditacion_inicio
+├─ fecha_acreditacion_fin
+├─ fecha_competencia_inicio
+├─ fecha_competencia_fin
+├─ fecha_premios
+├─ estado: [planificacion, acreditacion, competencia, entrega_premios, finalizado, cancelado]
+├─ es_activo (boolean)
+├─ creado_por (FK → Personaje)
+├─ fecha_creacion
+└─ fecha_modificacion
+
+TournamentMentor (NEW v2.0)
+├─ id (PK)
+├─ torneo_id (FK → Tournament)
+├─ mentor_id (FK → Personaje)
+├─ distrito_id (FK → District)
+├─ fecha_asignacion
+├─ asignado_por (FK → Personaje)
+├─ es_activa (boolean)
+└─ observaciones
+[UNIQUE: torneo + distrito]
+
+TournamentVigilante (NEW v2.0)
+├─ id (PK)
+├─ torneo_id (FK → Tournament)
+├─ vigilante_id (FK → Personaje)
+├─ rol_en_torneo: [general, acreditacion, competencia, premios]
+├─ fecha_asignacion
+├─ asignado_por (FK → Personaje)
+├─ es_activa (boolean)
+└─ observaciones
+
+TournamentStatus (NEW v2.0)
+├─ id (PK)
+├─ torneo_id (FK → Tournament)
+├─ estado_anterior
+├─ estado_nuevo
+├─ cambio_por (FK → Personaje)
+├─ fecha_cambio
+└─ notas
+
+Torneo (Legacy - arena app)
 ├─ id (PK)
 ├─ nombre
 ├─ edicion
@@ -653,6 +812,29 @@ UNPA_Coding_Games/
 │   ├── templates/arena/
 │   ├── static/arena/
 │   └── migrations/
+├── districts/                 # App de distritos (NEW v2.0)
+│   ├── models.py              # District, DistrictMembership
+│   ├── views.py
+│   ├── admin.py
+│   ├── templates/districts/
+│   └── migrations/
+├── tournaments/               # App de gestión de torneos (NEW v2.0)
+│   ├── models.py              # Tournament, TournamentMentor, TournamentVigilante, TournamentStatus
+│   ├── views.py               # CRUD torneos, asignaciones
+│   ├── forms.py               # Formularios y FormSets
+│   ├── urls.py
+│   ├── admin.py               # Admin personalizado
+│   ├── tests.py               # Suite de tests (9 tests)
+│   ├── templates/tournaments/
+│   │   ├── tournament_list.html
+│   │   ├── tournament_form.html
+│   │   ├── tournament_detail.html
+│   │   ├── add_mentor.html
+│   │   ├── add_vigilante.html
+│   │   ├── bulk_assign_mentors.html
+│   │   ├── bulk_assign_vigilantes.html
+│   │   └── confirm_remove_*.html
+│   └── migrations/
 ├── dashboards/                # App de dashboards
 │   ├── views.py               # Dashboards por rol, APIs
 │   ├── forms.py               # Asignaciones, enviar ayuda
@@ -662,13 +844,25 @@ UNPA_Coding_Games/
 │   │   └── js/
 │   │       └── notifications.js
 │   └── migrations/
+├── judge/                     # App de juez automático
+│   ├── models.py              # Submission, TestCaseResult
+│   ├── views.py               # API de ejecución
+│   ├── runner.py              # Ejecutor de código
+│   ├── docker_executor.py     # Ejecución en Docker
+│   ├── templates/judge/
+│   └── migrations/
 ├── centro_control/            # App auxiliar
 │   └── templates/centro_control/
 ├── unpa_code_games/           # Configuración proyecto
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
-├── PSI/                       # Documentación
+├── docs/                      # Documentación técnica
+│   ├── TOURNAMENTS_ARQUITECTURA_FINAL.md
+│   ├── TOURNAMENTS_REFACTOR_DISTRICTS.md
+│   ├── JUDGE_SYSTEM.md
+│   └── ... (otros docs)
+├── PSI/                       # Documentación formal
 │   └── Especificacion_Requerimientos.md
 └── db.sqlite3
 ```
@@ -720,6 +914,7 @@ python manage.py collectstatic
 | Versión | Fecha | Autor | Descripción |
 |---------|-------|-------|-------------|
 | 1.0 | 10/12/2025 | Equipo Dev | Versión inicial completa |
+| 2.0 | 16/12/2025 | Equipo Dev | **Nueva app tournaments**: gestión avanzada de torneos con períodos configurables, asignación de mentores a distritos, asignación de vigilantes con roles, auditoría de estados. **Nueva app districts**: gestión de distritos/unidades académicas. Refactorización arquitectónica para separación de responsabilidades. |
 
 ---
 
