@@ -2,16 +2,30 @@
 
 {% load static %}
 
+{% block header_title %}Acreditarse como Tributo{% endblock %}
+{% block header_subtitle %}{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'login' %}" class="nav-links-btn">Ya estoy acreditado</a>
+{% endblock %}
+
 {% block extra_styles %}
     <link rel="stylesheet" href="{% static 'capitol/css/register_styles.css' %}">
+    <style>
+        main {
+            display: flex;
+            align-items: stretch;
+        }
+        .register-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 <div class="register-container">
-    <div class="register-header">
-        <h1>🔥 Acreditación de Tributos 🔥</h1>
-        <p>"Que los odds estén siempre a tu favor"</p>
-    </div>
 
     {% if messages %}
         <div class="messages">
@@ -199,7 +213,7 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                🔥 Registrarse como Tributo 🔥
+                Acreditarse como Tributo
             </button>
         </form>
 

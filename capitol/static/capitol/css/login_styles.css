@@ -14,19 +14,18 @@
 
 /* ===== CONTENEDOR PRINCIPAL ===== */
 .login-container {
-    min-height: calc(100vh - 140px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 20px;
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
 }
 
 /* ===== SELLO DEL CAPITOLIO ===== */
 .capitol-seal {
     text-align: center;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     animation: fadeIn 0.8s ease-in;
 }
 
@@ -54,7 +53,7 @@
     background: rgba(26, 26, 26, 0.95);
     border: 2px solid var(--capitol-gold);
     border-radius: 12px;
-    padding: 40px;
+    padding: 30px;
     box-shadow: 0 10px 40px rgba(212, 175, 55, 0.2), 
                 0 0 30px rgba(212, 175, 55, 0.1);
     backdrop-filter: blur(10px);
@@ -70,9 +69,9 @@
 
 .form-title {
     text-align: center;
-    font-size: 1.8em;
+    font-size: 1.6em;
     color: var(--capitol-gold);
-    margin: 0 0 30px 0;
+    margin: 0 0 25px 0;
     font-weight: 700;
     letter-spacing: 1px;
 }
@@ -110,7 +109,7 @@
 
 /* ===== GRUPO DE FORMULARIO ===== */
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 18px;
 }
 
 .form-label {
@@ -156,7 +155,7 @@
 /* ===== BOTÓN DE ENVÍO ===== */
 .btn-submit {
     width: 100%;
-    padding: 14px 24px;
+    padding: 12px 24px;
     background: linear-gradient(135deg, var(--capitol-gold), var(--capitol-accent));
     color: #000;
     border: 2px solid var(--capitol-gold);
@@ -166,7 +165,7 @@
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .btn-submit:hover {
@@ -182,8 +181,8 @@
 /* ===== PIE DE LOGIN ===== */
 .login-footer {
     text-align: center;
-    margin-top: 25px;
-    padding-top: 20px;
+    margin-top: 20px;
+    padding-top: 15px;
     border-top: 1px solid rgba(212, 175, 55, 0.2);
 }
 
@@ -214,7 +213,7 @@
 
 /* ===== SÍMBOLO DECORATIVO ===== */
 .mockingjay-symbol {
-    margin-top: 40px;
+    margin-top: 20px;
     opacity: 0.1;
 }
 

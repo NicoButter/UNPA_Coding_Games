@@ -144,3 +144,85 @@ class Submission(models.Model):
         if self.casos_totales == 0:
             return 0
         return round((self.casos_pasados / self.casos_totales) * 100, 2)
+
+
+class TestCaseResult(models.Model):
+    """
+    Resultado de la ejecución de un caso de prueba individual.
+    Almacena el resultado detallado de cada test case ejecutado.
+    """
+    STATUS_CHOICES = [
+        ('PENDING', 'Pendiente'),
+        ('RUNNING', 'Ejecutando'),
+        ('PASSED', 'Pasado'),
+        ('FAILED', 'Fallido'),
+        ('TIMEOUT', 'Tiempo Excedido'),
+        ('MEMORY_ERROR', 'Error de Memoria'),
+        ('RUNTIME_ERROR', 'Error de Ejecución'),
+        ('ERROR', 'Error del Sistema'),
+    ]
+    
+    # Relaciones
+    submission = models.ForeignKey(
+        Submission,
+        on_delete=models.CASCADE,
+        related_name='test_results',
+        verbose_name='Entrega'
+    )
+    test_case = models.ForeignKey(
+        'challenges.TestCase',
+        on_delete=models.CASCADE,
+        related_name='execution_results',
+        verbose_name='Caso de Prueba'
+    )
+    
+    # Resultado
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING',
+        verbose_name='Estado'
+    )
+    passed = models.BooleanField(
+        default=False,
+        verbose_name='Pasado'
+    )
+    
+    # Datos de ejecución
+    actual_output = models.TextField(
+        blank=True,
+        verbose_name='Salida Real',
+        help_text='Output generado por el código del tributo'
+    )
+    execution_time = models.FloatField(
+        null=True,
+        blank=True,
+        verbose_name='Tiempo de Ejecución (segundos)'
+    )
+    memory_used = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name='Memoria Usada (MB)'
+    )
+    
+    # Errores
+    error_message = models.TextField(
+        blank=True,
+        verbose_name='Mensaje de Error',
+        help_text='Mensaje de error si el test falló'
+    )
+    
+    # Metadatos
+    executed_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Ejecutado en'
+    )
+    
+    class Meta:
+        verbose_name = 'Resultado de Test Case'
+        verbose_name_plural = 'Resultados de Test Cases'
+        ordering = ['submission', 'test_case__order']
+        unique_together = ['submission', 'test_case']
+    
+    def __str__(self):
+        return f"Test Result - Submission #{self.submission.id} - Test #{self.test_case.id} ({self.status})"

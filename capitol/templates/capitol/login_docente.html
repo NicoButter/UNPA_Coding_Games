@@ -8,17 +8,21 @@
 
 {% block extra_styles %}
     <link rel="stylesheet" href="{% static 'capitol/css/login_styles.css' %}">
+    <style>
+        main {
+            display: flex;
+            align-items: stretch;
+        }
+        .login-container {
+            flex: 1;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 <div class="login-container">
-    <div class="capitol-seal">
-        <h1 class="capitol-title">INGRESO AL CAPITOLIO</h1>
-        <p class="capitol-subtitle">Portal de Acceso para Docentes - Hunger Games de Código</p>
-    </div>
-    
     <div class="login-card">
-        <h2 class="form-title">Acceso Docentes y Mentores</h2>
+        <h2 class="form-title">Acceder al Capitolio</h2>
         
         {% if messages %}
             <div class="messages">

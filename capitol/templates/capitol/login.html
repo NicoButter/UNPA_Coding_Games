@@ -10,15 +10,19 @@
 
 {% block extra_styles %}
     <link rel="stylesheet" href="{% static 'capitol/css/login_styles.css' %}">
+    <style>
+        main {
+            display: flex;
+            align-items: stretch;
+        }
+        .login-container {
+            flex: 1;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 <div class="login-container">
-    <div class="capitol-seal">
-        <h1 class="capitol-title">EL CAPITOLIO</h1>
-        <p class="capitol-subtitle">Portal de Acceso - Hunger Games de Código</p>
-    </div>
-    
     <div class="login-card">
         <h2 class="form-title">Ingresar a la Arena</h2>
         

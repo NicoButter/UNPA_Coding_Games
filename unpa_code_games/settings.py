@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "dashboards",
     "arena",
     "judge",
+    "challenges",
 ]
 
 MIDDLEWARE = [
