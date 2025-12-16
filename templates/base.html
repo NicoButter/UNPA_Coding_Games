@@ -14,59 +14,27 @@
     <!-- Base styles -->
     <link rel="stylesheet" href="{% static 'css/base_styles.css' %}">
     
+    <!-- Fragments styles -->
+    <link rel="stylesheet" href="{% static 'css/fragments.css' %}">
+    
+    <!-- Dashboard common styles (for dashboard pages) -->
+    <link rel="stylesheet" href="{% static 'dashboards/css/dashboard_styles.css' %}">
+    
     <!-- Extra styles from child templates -->
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <div class="logo">
-                <a href="{% url 'home' %}">
-                    <img src="{% static 'images/logo_redondo_UNPA.png' %}" alt="Logo UNPA">
-                </a>
-            </div>
-            <div class="title">
-                <h1>{% block header_title %}🔥 Coding Games 🔥{% endblock %}</h1>
-                <p class="subtitle">{% block header_subtitle %}Hunger Games de Programación - UNPA{% endblock %}</p>
-            </div>
-            <nav class="nav-links">
-                {% block nav_links %}
-                {% if user.is_authenticated %}
-                    <a href="{% url 'perfil' %}">👤 Perfil</a>
-                    <a href="{% url 'dashboards:dashboard' %}">📊 Dashboard</a>
-                    {% if user.rol == 'jefe_capitolio' %}
-                        <a href="{% url 'admin:index' %}">⚙️ Admin</a>
-                    {% endif %}
-                    <a href="{% url 'logout' %}">🚪 Salir</a>
-                {% else %}
-                    <a href="{% url 'login' %}">🔐 Ingreso al Capitolio</a>
-                    <a href="{% url 'register' %}">📝 Acreditarse como Tributo</a>
-                {% endif %}
-                {% endblock %}
-            </nav>
-        </div>
-    </header>
+    {% include "fragments/header.html" %}
+    {% include "fragments/navbar.html" %}
 
     <main>
-        <!-- Mensajes del sistema -->
-        {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                        <button class="close-alert" onclick="this.parentElement.remove()">×</button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% include "fragments/messages.html" %}
 
         <!-- Contenido de las páginas -->
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        <p>&copy; 2024-2025 UNPA - The Coding Games | "Que los odds estén siempre a tu favor"</p>
-    </footer>
+    {% include "fragments/footer.html" %}
 
     <!-- Scripts adicionales -->
     {% block extra_scripts %}{% endblock %}

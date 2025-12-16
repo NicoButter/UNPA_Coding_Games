@@ -1,0 +1,11 @@
+<!-- Mensajes del sistema -->
+{% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+                <button class="close-alert" onclick="this.parentElement.remove()">×</button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

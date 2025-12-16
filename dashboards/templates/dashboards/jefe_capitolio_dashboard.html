@@ -1,28 +1,41 @@
-{% extends 'dashboards/base_dashboard.html' %}
+{% extends 'base.html' %}
 
 {% load static %}
 
 {% block header_title %}🏛️ Control del Capitolio{% endblock %}
 
-{% block dashboard_extra_styles %}
+{% block extra_styles %}
     <link rel="stylesheet" href="{% static 'dashboards/css/jefe_capitolio_dashboard.css' %}">
 {% endblock %}
 
-{% block dashboard_nav %}
-    <a href="#resumen" class="nav-link active">Resumen</a>
-    <a href="#distritos" class="nav-link">Distritos</a>
-    <a href="{% url 'tournaments:tournament_list' %}" class="nav-link">Competencias</a>
-    <a href="#reportes" class="nav-link">Reportes</a>
-{% endblock %}
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+    </div>
 
-{% block dashboard_stats %}
-    {% include 'dashboards/components/stats_card.html' with title="Total Tributos" value=stats.total_tributos icon="👥" %}
-    {% include 'dashboards/components/stats_card.html' with title="Competencias Activas" value=stats.competencias_activas icon="🎮" color="info" %}
-    {% include 'dashboards/components/stats_card.html' with title="Mentores" value=stats.total_mentores icon="🎓" color="success" %}
-    {% include 'dashboards/components/stats_card.html' with title="Vigilantes" value=stats.total_vigilantes icon="👁️" color="warning" %}
-{% endblock %}
+    <!-- Navegación de Acciones Rápidas -->
+    <nav class="dashboard-nav">
+        <div class="dashboard-nav-right">
+            <a href="#resumen" class="nav-link active">Resumen</a>
+            <a href="#distritos" class="nav-link">Distritos</a>
+            <a href="{% url 'tournaments:tournament_list' %}" class="nav-link">Competencias</a>
+            <a href="#reportes" class="nav-link">Reportes</a>
+        </div>
+    </nav>
 
-{% block dashboard_content %}
+    <!-- Contenedor principal del dashboard -->
+    <div class="dashboard-container">
+        <!-- Estadísticas principales -->
+        <div class="stats-container">
+        {% include 'dashboards/components/stats_card.html' with title="Total Tributos" value=stats.total_tributos icon="👥" %}
+        {% include 'dashboards/components/stats_card.html' with title="Competencias Activas" value=stats.competencias_activas icon="🎮" color="info" %}
+        {% include 'dashboards/components/stats_card.html' with title="Mentores" value=stats.total_mentores icon="🎓" color="success" %}
+        {% include 'dashboards/components/stats_card.html' with title="Vigilantes" value=stats.total_vigilantes icon="👁️" color="warning" %}
+        </div>
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
 <div class="dashboard-row">
     <div class="dashboard-col-8">
         <!-- Resumen Ejecutivo -->
@@ -158,6 +171,7 @@
         </div>
 
         {% include 'dashboards/components/recent_activity.html' %}
+        </div>
     </div>
 </div>
 {% endblock %}

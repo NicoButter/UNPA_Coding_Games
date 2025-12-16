@@ -1,0 +1,15 @@
+<nav class="nav-links">
+    {% block nav_links %}
+        {% if user.is_authenticated %}
+            {% if user.rol == 'jefe_capitolio' %}
+                {% include "fragments/navbar_by_role/navbar_jefe.html" %}
+            {% elif user.rol == 'mentor' %}
+                {% include "fragments/navbar_by_role/navbar_mentor.html" %}
+            {% else %}
+                {% include "fragments/navbar_by_role/navbar_tributo.html" %}
+            {% endif %}
+        {% else %}
+            {% include "fragments/navbar_by_role/navbar_anonymous.html" %}
+        {% endif %}
+    {% endblock %}
+</nav>

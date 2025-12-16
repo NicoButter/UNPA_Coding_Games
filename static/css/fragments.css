@@ -1,0 +1,220 @@
+/* ============================================
+   Estilos de Fragmentos (Header, Navbar, Footer)
+   Tema: The Hunger Games - Capitolio
+   ============================================ */
+
+/* Los estilos base están en base_styles.css:
+   - header, .header-container, .logo, .title
+   - .nav-links, .nav-links a
+   - footer, footer p
+   
+   Este archivo sirve como punto de extensión para estilos adicionales
+   específicos de fragmentos si es necesario.
+*/
+
+/* ============================================
+   HEADER - Encabezado Principal
+   ============================================ */
+
+header {
+    /* Estilos definidos en base_styles.css */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* ============================================
+   NAVBAR - Navegación por Rol
+   ============================================ */
+
+.nav-links {
+    /* Estilos base en base_styles.css */
+}
+
+/* Estilos específicos para cada rol */
+.nav-links a {
+    /* Estilos base en base_styles.css */
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.1);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+    pointer-events: none;
+}
+
+.nav-links a:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* ============================================
+   FOOTER - Pie de Página
+   ============================================ */
+
+footer {
+    /* Estilos base en base_styles.css */
+    border-top: 2px solid rgba(212, 175, 55, 0.2);
+}
+
+footer p {
+    /* Estilos base en base_styles.css */
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   MENSAJES DEL SISTEMA
+   ============================================ */
+
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 20px auto;
+    width: calc(100% - 40px);
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    background: rgba(46, 204, 113, 0.1);
+    border: 2px solid #2ecc71;
+    color: #2ecc71;
+}
+
+.alert-error {
+    background: rgba(231, 76, 60, 0.1);
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+}
+
+.alert-warning {
+    background: rgba(243, 156, 18, 0.1);
+    border: 2px solid #f39c12;
+    color: #f39c12;
+}
+
+.alert-info {
+    background: rgba(52, 152, 219, 0.1);
+    border: 2px solid #3498db;
+    color: #3498db;
+}
+
+.close-alert {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.3em;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-alert:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: rotate(90deg);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .logo img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .title h1 {
+        font-size: 1.6em;
+    }
+
+    .title .subtitle {
+        font-size: 0.85em;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .nav-links a {
+        font-size: 0.7em;
+        padding: 5px 12px;
+    }
+
+    .messages-container {
+        padding: 10px;
+        width: calc(100% - 20px);
+    }
+
+    .alert {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-container {
+        padding: 10px 15px;
+    }
+
+    .logo img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .title h1 {
+        font-size: 1.3em;
+    }
+
+    .nav-links {
+        gap: 4px;
+    }
+
+    .nav-links a {
+        font-size: 0.65em;
+        padding: 4px 8px;
+    }
+}

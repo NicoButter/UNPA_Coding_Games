@@ -1,0 +1,15 @@
+{% load static %}
+
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'images/logo_redondo_UNPA.png' %}" alt="Logo UNPA">
+            </a>
+        </div>
+        <div class="title">
+            <h1>{% block header_title %}🔥 Coding Games 🔥{% endblock %}</h1>
+            <p class="subtitle">{% block header_subtitle %}Hunger Games de Programación - UNPA{% endblock %}</p>
+        </div>
+    </div>
+</header>

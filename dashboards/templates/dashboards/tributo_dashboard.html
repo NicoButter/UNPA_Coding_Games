@@ -1,16 +1,36 @@
-{% extends 'dashboards/base_dashboard.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block dashboard_title %}Panel del Tributo{% endblock %}
+{% block header_title %}Panel del Tributo{% endblock %}
 
-{% block dashboard_stats %}
-    {% include 'dashboards/components/stats_card.html' with title="Mi Distrito" value=tributo_info.distrito icon="🏛️" %}
-    {% include 'dashboards/components/stats_card.html' with title="Nivel" value=tributo_info.get_nivel_display icon="⭐" %}
-    {% include 'dashboards/components/stats_card.html' with title="Estado" value=tributo_info.get_estado_display icon="🎯" %}
-    {% include 'dashboards/components/stats_card.html' with title="Código" value=tributo_info.codigo_tributo icon="🔖" %}
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'dashboards/css/dashboard_styles.css' %}">
 {% endblock %}
 
-{% block dashboard_content %}
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+    </div>
+
+    <!-- Navegación de Acciones Rápidas -->
+    <nav class="dashboard-nav">
+        <div class="dashboard-nav-right">
+        </div>
+    </nav>
+
+    <!-- Contenedor principal del dashboard -->
+    <div class="dashboard-container">
+        <!-- Estadísticas principales -->
+        <div class="stats-container">
+        {% include 'dashboards/components/stats_card.html' with title="Mi Distrito" value=tributo_info.distrito icon="🏛️" %}
+        {% include 'dashboards/components/stats_card.html' with title="Nivel" value=tributo_info.get_nivel_display icon="⭐" %}
+        {% include 'dashboards/components/stats_card.html' with title="Estado" value=tributo_info.get_estado_display icon="🎯" %}
+        {% include 'dashboards/components/stats_card.html' with title="Código" value=tributo_info.codigo_tributo icon="🔖" %}
+        </div>
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
 <div class="dashboard-row">
     <div class="dashboard-col-8">
         <div class="dashboard-card">
@@ -125,6 +145,7 @@
                 <li>Revisa los desafíos disponibles</li>
                 <li>Participa en las competencias para ganar experiencia</li>
             </ul>
+        </div>
         </div>
     </div>
 </div>

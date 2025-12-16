@@ -1,16 +1,36 @@
-{% extends 'dashboards/base_dashboard.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block dashboard_title %}Panel del Mentor{% endblock %}
+{% block header_title %}Panel del Mentor{% endblock %}
 
-{% block dashboard_stats %}
-    {% include 'dashboards/components/stats_card.html' with title="Mis Tributos" value=stats.mis_tributos icon="👥" %}
-    {% include 'dashboards/components/stats_card.html' with title="En Competencia" value=stats.en_competencia icon="🎯" color="info" %}
-    {% include 'dashboards/components/stats_card.html' with title="Victorias" value=stats.victorias icon="🏆" color="success" %}
-    {% include 'dashboards/components/stats_card.html' with title="Distrito" value=stats.distrito icon="🏛️" %}
+{% block extra_styles %}
+    <link rel="stylesheet" href="{% static 'dashboards/css/dashboard_styles.css' %}">
 {% endblock %}
 
-{% block dashboard_content %}
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+    </div>
+
+    <!-- Navegación de Acciones Rápidas -->
+    <nav class="dashboard-nav">
+        <div class="dashboard-nav-right">
+        </div>
+    </nav>
+
+    <!-- Contenedor principal del dashboard -->
+    <div class="dashboard-container">
+        <!-- Estadísticas principales -->
+        <div class="stats-container">
+        {% include 'dashboards/components/stats_card.html' with title="Mis Tributos" value=stats.mis_tributos icon="👥" %}
+        {% include 'dashboards/components/stats_card.html' with title="En Competencia" value=stats.en_competencia icon="🎯" color="info" %}
+        {% include 'dashboards/components/stats_card.html' with title="Victorias" value=stats.victorias icon="🏆" color="success" %}
+        {% include 'dashboards/components/stats_card.html' with title="Distrito" value=stats.distrito icon="🏛️" %}
+        </div>
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
 <div class="dashboard-row">
     <div class="dashboard-col-8">
         <div class="dashboard-card">
@@ -111,6 +131,7 @@
                     <span>Realizar simulacro de competencia</span>
                 </li>
             </ul>
+        </div>
         </div>
     </div>
 </div>
