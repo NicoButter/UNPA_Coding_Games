@@ -164,11 +164,17 @@
     gap: 0;
 }
 
-.dashboard-nav-left,
+.dashboard-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
 .dashboard-nav-right {
     display: flex;
     align-items: center;
     gap: 0;
+    margin-left: auto;
 }
 
 .dashboard-nav a,
