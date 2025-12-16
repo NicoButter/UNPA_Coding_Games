@@ -11,7 +11,7 @@
 {% block dashboard_nav %}
     <a href="#resumen" class="nav-link active">Resumen</a>
     <a href="#distritos" class="nav-link">Distritos</a>
-    <a href="#competencias" class="nav-link">Competencias</a>
+    <a href="{% url 'tournaments:tournament_list' %}" class="nav-link">Competencias</a>
     <a href="#reportes" class="nav-link">Reportes</a>
 {% endblock %}
 
@@ -62,7 +62,7 @@
         </div>
 
         <!-- Tributos por Distrito -->
-        <div class="dashboard-card">
+        <div id="distritos" class="dashboard-card">
             <h3>🏛️ Tributos por Distrito</h3>
             <div class="district-overview">
                 <table class="data-table">
@@ -114,11 +114,11 @@
                     <span class="setting-icon">🔧</span>
                     <span>Panel de Administración</span>
                 </a>
-                <a href="#" class="setting-item">
+                <a href="{% url 'tournaments:tournament_list' %}" class="setting-item">
                     <span class="setting-icon">📝</span>
                     <span>Gestionar Competencias</span>
                 </a>
-                <a href="#" class="setting-item">
+                <a href="{% url 'admin:capitol_personaje_changelist' %}" class="setting-item">
                     <span class="setting-icon">👥</span>
                     <span>Gestionar Usuarios</span>
                 </a>
