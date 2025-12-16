@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ torneo.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">
+                <i class="fas fa-trophy"></i> {{ torneo.nombre }}
+            </h1>
+            <p class="text-muted">Edición #{{ torneo.numero_edicion }}</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'tournaments:tournament_update' torneo.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'tournaments:tournament_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Estado del Torneo -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6 class="text-muted mb-1">Estado</h6>
+                            {% if torneo.estado == 'planificacion' %}
+                                <span class="badge bg-secondary px-3 py-2">En Planificación</span>
+                            {% elif torneo.estado == 'acreditacion' %}
+                                <span class="badge bg-info px-3 py-2">Acreditación</span>
+                            {% elif torneo.estado == 'competencia' %}
+                                <span class="badge bg-warning px-3 py-2">En Competencia</span>
+                            {% elif torneo.estado == 'entrega_premios' %}
+                                <span class="badge bg-success px-3 py-2">Entrega de Premios</span>
+                            {% elif torneo.estado == 'finalizado' %}
+                                <span class="badge bg-dark px-3 py-2">Finalizado</span>
+                            {% elif torneo.estado == 'cancelado' %}
+                                <span class="badge bg-danger px-3 py-2">Cancelado</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-muted mb-1">Activo</h6>
+                            {% if torneo.es_activo %}
+                                <span class="badge bg-success">Sí</span>
+                            {% else %}
+                                <span class="badge bg-danger">No</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-muted mb-1">Creado el</h6>
+                            <p class="mb-0">{{ torneo.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h6 class="text-muted mb-1">Actualizado</h6>
+                            <p class="mb-0">{{ torneo.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cronograma de Fechas -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h3 class="mb-3">
+                <i class="fas fa-calendar-alt"></i> Cronograma de Fechas
+            </h3>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-file-check"></i> Período de Acreditación
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Inicio:</strong></p>
+                    <p class="text-muted">{{ torneo.fecha_acreditacion_inicio|date:"d/m/Y H:i" }}</p>
+                    <hr>
+                    <p class="mb-1"><strong>Fin:</strong></p>
+                    <p class="text-muted">{{ torneo.fecha_acreditacion_fin|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-code"></i> Período de Competencia
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Inicio:</strong></p>
+                    <p class="text-muted">{{ torneo.fecha_competencia_inicio|date:"d/m/Y H:i" }}</p>
+                    <hr>
+                    <p class="mb-1"><strong>Fin:</strong></p>
+                    <p class="text-muted">{{ torneo.fecha_competencia_fin|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-award"></i> Entrega de Premios
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Fecha y Hora:</strong></p>
+                    <p class="text-muted">{{ torneo.fecha_premios|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mentores Asignados -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chalkboard-user"></i> Mentores Asignados ({{ mentores.count }})
+                    </h5>
+                    <a href="{% url 'tournaments:add_mentor' torneo.pk %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> Agregar Mentor
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if mentores %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mentor</th>
+                                        <th>Distrito</th>
+                                        <th>Asignado por</th>
+                                        <th>Fecha de Asignación</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for mentor_asig in mentores %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ mentor_asig.mentor.get_full_name }}</strong>
+                                            </td>
+                                            <td>{{ mentor_asig.distrito.name }}</td>
+                                            <td>{{ mentor_asig.asignado_por.get_full_name }}</td>
+                                            <td>{{ mentor_asig.fecha_asignacion|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="{% url 'tournaments:remove_mentor' mentor_asig.pk %}" 
+                                                   class="btn btn-sm btn-danger"
+                                                   onclick="return confirm('¿Remover este mentor?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-triangle"></i> No hay mentores asignados. 
+                            <a href="{% url 'tournaments:add_mentor' torneo.pk %}">Asignar mentores</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Distritos Sin Mentor -->
+    {% if distritos_sin_mentor %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <h5>
+                        <i class="fas fa-info-circle"></i> Distritos sin Mentor
+                    </h5>
+                    <p class="mb-0">
+                        Hay {{ distritos_sin_mentor.count }} distritos sin mentor asignado:
+                    </p>
+                    <ul class="mb-0 mt-2">
+                        {% for distrito in distritos_sin_mentor %}
+                            <li>{{ distrito.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Vigilantes Asignados -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-shield"></i> Vigilantes Asignados ({{ vigilantes.count }})
+                    </h5>
+                    <a href="{% url 'tournaments:add_vigilante' torneo.pk %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-plus"></i> Agregar Vigilante
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if vigilantes %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Vigilante</th>
+                                        <th>Rol en Torneo</th>
+                                        <th>Asignado por</th>
+                                        <th>Fecha de Asignación</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vigilante_asig in vigilantes %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ vigilante_asig.vigilante.get_full_name }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    {{ vigilante_asig.get_rol_en_torneo_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ vigilante_asig.asignado_por.get_full_name }}</td>
+                                            <td>{{ vigilante_asig.fecha_asignacion|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="{% url 'tournaments:remove_vigilante' vigilante_asig.pk %}" 
+                                                   class="btn btn-sm btn-danger"
+                                                   onclick="return confirm('¿Remover este vigilante?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-triangle"></i> No hay vigilantes asignados. 
+                            <a href="{% url 'tournaments:add_vigilante' torneo.pk %}">Asignar vigilantes</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Cambios -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i> Últimos Cambios de Estado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if historial %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>De</th>
+                                        <th>A</th>
+                                        <th>Cambio realizado por</th>
+                                        <th>Fecha</th>
+                                        <th>Razón</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cambio in historial %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-warning">
+                                                    {{ cambio.get_estado_anterior_display }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    {{ cambio.get_estado_nuevo_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ cambio.cambio_por.get_full_name }}</td>
+                                            <td>{{ cambio.fecha_cambio|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ cambio.razon|default:"Sin especificar" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Sin cambios registrados.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

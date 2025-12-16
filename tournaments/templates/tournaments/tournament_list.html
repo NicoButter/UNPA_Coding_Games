@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Torneos{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-4">
+                <i class="fas fa-trophy"></i> Gestión de Torneos
+            </h1>
+            <p class="text-muted">Crea y administra los torneos de programación</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'tournaments:tournament_create' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Crear Nuevo Torneo
+            </a>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Total de Torneos</h6>
+                    <h3 class="mb-0">{{ total_torneos }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title text-muted">Torneos Activos</h6>
+                    <h3 class="mb-0">{{ torneos_activos }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Torneos -->
+    <div class="card">
+        <div class="table-responsive">
+            {% if torneos %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Edición</th>
+                            <th>Estado</th>
+                            <th>Acreditación</th>
+                            <th>Competencia</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for torneo in torneos %}
+                            <tr>
+                                <td>
+                                    <strong>{{ torneo.nombre }}</strong>
+                                </td>
+                                <td>#{{ torneo.numero_edicion }}</td>
+                                <td>
+                                    {% if torneo.estado == 'planificacion' %}
+                                        <span class="badge bg-secondary">En Planificación</span>
+                                    {% elif torneo.estado == 'acreditacion' %}
+                                        <span class="badge bg-info">Acreditación</span>
+                                    {% elif torneo.estado == 'competencia' %}
+                                        <span class="badge bg-warning">En Competencia</span>
+                                    {% elif torneo.estado == 'entrega_premios' %}
+                                        <span class="badge bg-success">Entrega de Premios</span>
+                                    {% elif torneo.estado == 'finalizado' %}
+                                        <span class="badge bg-dark">Finalizado</span>
+                                    {% elif torneo.estado == 'cancelado' %}
+                                        <span class="badge bg-danger">Cancelado</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ torneo.fecha_acreditacion_inicio|date:"d/m/Y H:i" }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ torneo.fecha_competencia_inicio|date:"d/m/Y H:i" }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'tournaments:tournament_detail' torneo.pk %}" 
+                                           class="btn btn-sm btn-info" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'tournaments:tournament_update' torneo.pk %}" 
+                                           class="btn btn-sm btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'tournaments:tournament_delete' torneo.pk %}" 
+                                           class="btn btn-sm btn-danger" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info m-4">
+                    <i class="fas fa-info-circle"></i> No hay torneos registrados.
+                    <a href="{% url 'tournaments:tournament_create' %}">Crear el primer torneo</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">Primera</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

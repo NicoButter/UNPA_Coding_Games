@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agregar Vigilante - {{ torneo.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2 class="mb-4">
+                <i class="fas fa-plus-circle"></i> Asignar Vigilante
+            </h2>
+            
+            <div class="alert alert-info">
+                <strong>Torneo:</strong> {{ torneo.nombre }} - Edición #{{ torneo.numero_edicion }}
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.vigilante.id_for_label }}" class="form-label">
+                                Seleccionar Vigilante *
+                            </label>
+                            {{ form.vigilante }}
+                            {% if form.vigilante.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.vigilante.errors }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-2">
+                                Se muestran solo vigilantes que aún no están asignados a este torneo
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.rol_en_torneo.id_for_label }}" class="form-label">
+                                Rol en el Torneo *
+                            </label>
+                            {{ form.rol_en_torneo }}
+                            {% if form.rol_en_torneo.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.rol_en_torneo.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.observaciones.id_for_label }}" class="form-label">
+                                Observaciones
+                            </label>
+                            {{ form.observaciones }}
+                            {% if form.observaciones.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.observaciones.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Asignar Vigilante
+                            </button>
+                            <a href="{% url 'tournaments:tournament_detail' torneo.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Unidades Académicas{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-4">
+                <i class="fas fa-university"></i> Unidades Académicas
+            </h1>
+            <p class="text-muted">Gestión de unidades académicas que participan en torneos</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'tournaments:unidad_academica_create' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Crear Unidad
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            {% if unidades %}
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Código</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for unidad in unidades %}
+                            <tr>
+                                <td>
+                                    <strong>{{ unidad.nombre }}</strong>
+                                    {% if unidad.descripcion %}
+                                        <br>
+                                        <small class="text-muted">{{ unidad.descripcion|truncatewords:10 }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ unidad.codigo }}</td>
+                                <td>{{ unidad.ubicacion|default:"No especificado" }}</td>
+                                <td>
+                                    {% if unidad.es_activa %}
+                                        <span class="badge bg-success">Activa</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactiva</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'tournaments:unidad_academica_update' unidad.pk %}" 
+                                           class="btn btn-sm btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info m-4">
+                    <i class="fas fa-info-circle"></i> No hay unidades académicas registradas.
+                    <a href="{% url 'tournaments:unidad_academica_create' %}">Crear la primera unidad</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">Primera</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

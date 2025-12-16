@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Torneo - {{ torneo.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="alert alert-danger">
+                <h3 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle"></i> ¿Estás seguro?
+                </h3>
+                <p class="mb-0">
+                    Se eliminará permanentemente el torneo <strong>"{{ torneo.nombre }}" (Edición #{{ torneo.numero_edicion }})</strong>
+                    y todos sus datos asociados (mentores, vigilantes, etc.).
+                </p>
+                <p class="mb-0 mt-2 text-warning">
+                    <strong>Esta acción no se puede deshacer.</strong>
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash"></i> Sí, eliminar torneo
+                            </button>
+                            <a href="{% url 'tournaments:tournament_detail' torneo.pk %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "judge",
     "challenges",
     "districts",
+    "tournaments",
 ]
 
 MIDDLEWARE = [

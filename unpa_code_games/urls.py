@@ -27,6 +27,7 @@ urlpatterns = [
     path('dashboard/', include('dashboards.urls', namespace='dashboards')),
     path('arena/', include('arena.urls', namespace='arena')),
     path('judge/', include('judge.urls', namespace='judge')),
+    path('tournaments/', include('tournaments.urls', namespace='tournaments')),
 ]
 
 # Servir archivos media en desarrollo

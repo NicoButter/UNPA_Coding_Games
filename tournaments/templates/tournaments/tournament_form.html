@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-plus-circle"></i> {{ title }}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Información Básica -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                        Nombre del Torneo *
+                                    </label>
+                                    {{ form.nombre }}
+                                    {% if form.nombre.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.nombre.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.numero_edicion.id_for_label }}" class="form-label">
+                                        Número de Edición *
+                                    </label>
+                                    {{ form.numero_edicion }}
+                                    {% if form.numero_edicion.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.numero_edicion.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                                Descripción
+                            </label>
+                            {{ form.descripcion }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.descripcion.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Fechas de Acreditación -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-calendar-alt"></i> Período de Acreditación
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.fecha_acreditacion_inicio.id_for_label }}" class="form-label">
+                                            Inicio *
+                                        </label>
+                                        {{ form.fecha_acreditacion_inicio }}
+                                        {% if form.fecha_acreditacion_inicio.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.fecha_acreditacion_inicio.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.fecha_acreditacion_fin.id_for_label }}" class="form-label">
+                                            Fin *
+                                        </label>
+                                        {{ form.fecha_acreditacion_fin }}
+                                        {% if form.fecha_acreditacion_fin.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.fecha_acreditacion_fin.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block">
+                                Período en que los participantes pueden acreditarse
+                            </small>
+                        </div>
+
+                        <!-- Fechas de Competencia -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-code"></i> Período de Competencia
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.fecha_competencia_inicio.id_for_label }}" class="form-label">
+                                            Inicio *
+                                        </label>
+                                        {{ form.fecha_competencia_inicio }}
+                                        {% if form.fecha_competencia_inicio.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.fecha_competencia_inicio.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.fecha_competencia_fin.id_for_label }}" class="form-label">
+                                            Fin *
+                                        </label>
+                                        {{ form.fecha_competencia_fin }}
+                                        {% if form.fecha_competencia_fin.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.fecha_competencia_fin.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block">
+                                Período en que se realiza la competencia de programación
+                            </small>
+                        </div>
+
+                        <!-- Fecha de Premios -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-award"></i> Entrega de Premios
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.fecha_premios.id_for_label }}" class="form-label">
+                                            Fecha y Hora *
+                                        </label>
+                                        {{ form.fecha_premios }}
+                                        {% if form.fecha_premios.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.fecha_premios.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block">
+                                Fecha y hora para la ceremonia de entrega de premios
+                            </small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Configuración -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-cog"></i> Configuración del Torneo
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        {{ form.permite_equipos }}
+                                        <label class="form-check-label" for="{{ form.permite_equipos.id_for_label }}">
+                                            Permitir competencia por equipos
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        {{ form.puntuacion_por_unidad }}
+                                        <label class="form-check-label" for="{{ form.puntuacion_por_unidad.id_for_label }}">
+                                            Puntuación por unidad académica
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.puntos_minimos_ganar.id_for_label }}" class="form-label">
+                                            Puntos mínimos para ganar
+                                        </label>
+                                        {{ form.puntos_minimos_ganar }}
+                                        {% if form.puntos_minimos_ganar.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.puntos_minimos_ganar.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Imagen del Torneo -->
+                        <div class="mb-4">
+                            <label for="{{ form.imagen.id_for_label }}" class="form-label">
+                                Imagen del Torneo
+                            </label>
+                            {{ form.imagen }}
+                            {% if form.imagen.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.imagen.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger mt-3">
+                                <strong>Error:</strong>
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Botones -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> {{ button_text }}
+                            </button>
+                            <a href="{% url 'tournaments:tournament_list' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
