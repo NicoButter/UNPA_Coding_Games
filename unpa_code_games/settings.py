@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "arena",
     "judge",
     "challenges",
+    "districts",
 ]
 
 MIDDLEWARE = [
