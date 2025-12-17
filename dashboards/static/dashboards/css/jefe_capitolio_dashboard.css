@@ -20,8 +20,81 @@
     --neutral: #95a5a6;
 }
 
-/* Dashboard Container - Sin cambios, heredado de base */
-/* El contenedor ya tiene los estilos correctos en dashboard_styles.css */
+/* Dashboard Wrapper - Contenedor exterior */
+.dashboard-wrapper {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Dashboard Container - Contenedor interno */
+.dashboard-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    display: none;
+}
+
+/* Dashboard Navigation */
+.dashboard-nav {
+    background: linear-gradient(90deg, rgba(107, 59, 107, 0.1), rgba(212, 175, 55, 0.08));
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow-x: auto;
+    gap: 0;
+}
+
+.dashboard-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.dashboard-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-left: auto;
+}
+
+.dashboard-nav a,
+.dashboard-nav button,
+.nav-link {
+    padding: 16px 24px;
+    color: var(--capitol-light);
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.dashboard-nav a:hover,
+.dashboard-nav button:hover,
+.nav-link:hover {
+    color: var(--capitol-gold);
+    border-bottom-color: var(--capitol-gold);
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.dashboard-nav a.active,
+.dashboard-nav button.active,
+.nav-link.active {
+    color: var(--capitol-gold);
+    border-bottom-color: var(--capitol-gold);
+    background: rgba(212, 175, 55, 0.15);
+}
 
 /* Cards con efecto elegante */
 .dashboard-card {

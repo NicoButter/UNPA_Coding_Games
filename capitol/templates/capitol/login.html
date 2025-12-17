@@ -5,7 +5,8 @@
 {% block header_subtitle %}{% endblock %}
 
 {% block nav_links %}
-    <a href="{% url 'register' %}" class="nav-links-btn">Acreditarse como Tributo</a>
+    <a href="{% url 'login' %}" class="active">Ingresar a la Arena</a>
+    <a href="{% url 'login_docente' %}">Ingresar al Capitolio</a>
 {% endblock %}
 
 {% block extra_styles %}

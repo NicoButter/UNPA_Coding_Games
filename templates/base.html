@@ -17,15 +17,15 @@
     <!-- Fragments styles -->
     <link rel="stylesheet" href="{% static 'css/fragments.css' %}">
     
-    <!-- Dashboard common styles (for dashboard pages) -->
-    <link rel="stylesheet" href="{% static 'dashboards/css/dashboard_styles.css' %}">
-    
     <!-- Extra styles from child templates -->
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
     {% include "fragments/header.html" %}
-    {% include "fragments/navbar.html" %}
+    
+    {% block navbar %}
+        {% include "fragments/navbar.html" %}
+    {% endblock %}
 
     <main>
         {% include "fragments/messages.html" %}

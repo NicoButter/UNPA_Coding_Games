@@ -4,7 +4,10 @@
 {% block header_title %}Ingreso al Capitolio{% endblock %}
 {% block header_subtitle %}{% endblock %}
 
-{% block nav_links %}{% endblock %}
+{% block nav_links %}
+    <a href="{% url 'login' %}">Ingresar a la Arena</a>
+    <a href="{% url 'login_docente' %}" class="active">Ingresar al Capitolio</a>
+{% endblock %}
 
 {% block extra_styles %}
     <link rel="stylesheet" href="{% static 'capitol/css/login_styles.css' %}">

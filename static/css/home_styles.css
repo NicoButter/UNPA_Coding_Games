@@ -1,0 +1,102 @@
+/* Navbar de bienvenida */
+.welcome-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(45, 45, 45, 0.95));
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 10;
+}
+
+.welcome-text {
+    flex: 1;
+}
+
+.welcome-text h2 {
+    color: #d4af37;
+    margin: 0 0 8px 0;
+    font-size: 1.8em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.welcome-text p {
+    color: #e8e4d9;
+    margin: 0;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/* Estilos para el botón */
+.btn {
+    display: inline-block;
+    padding: 12px 32px;
+    background: linear-gradient(135deg, #d4af37, #b8940a);
+    color: #0a0a0a;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    white-space: nowrap;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+}
+
+/* Estilos para el carrusel */
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.carousel-images {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-images img {
+    width: 100%;
+    min-width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Botones del carrusel */
+.carousel-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+}
+
+.carousel-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+

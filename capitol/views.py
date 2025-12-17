@@ -13,7 +13,9 @@ from django.utils import timezone
 
 
 def home_view(request):
-    return render(request, 'capitol/index.html')
+    """Vista de la página de inicio con carrusel"""
+    return render(request, 'home.html')
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -305,45 +307,5 @@ def acreditar_tributo_qr(request):
 
 
 # Vista de login con webcam para tributos
-def login_webcam(request):
-    """
-    Vista de login alternativa con escaneo de QR por webcam
-    Para usar en las terminales de la sala de competencia
-    """
-    if request.method == 'POST':
-        qr_token = request.POST.get('qr_token', '').strip()
-        
-        if not qr_token:
-            return JsonResponse({'error': 'Token QR no proporcionado'}, status=400)
-        
-        try:
-            tributo = TributoInfo.objects.get(qr_token=qr_token)
-            
-            # Verificar que esté acreditado
-            if tributo.estado != 'acreditado':
-                return JsonResponse({
-                    'error': 'Debes acreditarte primero con el vigilante',
-                    'codigo': 'NOT_ACCREDITED'
-                }, status=403)
-            
-            # Autenticar al usuario
-            user = tributo.personaje
-            
-            # Login directo (sin contraseña, autenticación por QR)
-            from django.contrib.auth import login as auth_login
-            auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            
-            return JsonResponse({
-                'success': True,
-                'mensaje': f'Bienvenido {user.get_full_name()}',
-                'redirect_url': '/dashboard/'
-            })
-            
-        except TributoInfo.DoesNotExist:
-            return JsonResponse({'error': 'QR inválido'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': f'Error: {str(e)}'}, status=500)
-    
-    # GET: Mostrar interfaz de login con webcam
-    return render(request, 'capitol/login_webcam.html')
+
 

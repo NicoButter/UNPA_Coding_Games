@@ -11,5 +11,41 @@
             <h1>{% block header_title %}🔥 Coding Games 🔥{% endblock %}</h1>
             <p class="subtitle">{% block header_subtitle %}Hunger Games de Programación - UNPA{% endblock %}</p>
         </div>
+        
+        {% if not user.is_authenticated %}
+            <div class="header-buttons">
+                <a href="{% url 'login' %}" class="header-btn">Ingreso a la Arena</a>
+                <a href="{% url 'login_docente' %}" class="header-btn">Ingreso al Capitolio</a>
+            </div>
+        {% endif %}
     </div>
 </header>
+
+<style>
+    .header-buttons {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    
+    .header-btn {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #d4af37, #f0e68c);
+        color: #0a0a0a !important;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        font-size: 0.9em;
+        white-space: nowrap;
+    }
+    
+    .header-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+    }
+</style>

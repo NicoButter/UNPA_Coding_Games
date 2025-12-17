@@ -1,41 +1,19 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block header_title %}Coding Games{% endblock %}
 {% block header_subtitle %}¡Prepárate para demostrar tus habilidades en nuestra competencia anual de programación!{% endblock %}
 
-{% block nav_links %}
-    <a href="{% url 'login' %}" class="nav-btn">Ingreso a la Arena</a>
-    <a href="{% url 'login_docente' %}" class="nav-btn">Ingreso al Capitolio</a>
-{% endblock %}
-
-{% block content %}
-    <div class="carousel">
-        <div class="carousel-images">
-            <img src="{% static 'images/code_camp_1.jpg' %}" alt="Slide 1">
-            <img src="{% static 'images/code_camp_4.jpg' %}" alt="Slide 2">
-            <img src="{% static 'images/code_camp_3.jpg' %}" alt="Slide 3">
-            <img src="{% static 'images/capitol_maker.jpg' %}" alt="Slide 4">
-            <!-- Duplicamos las imágenes para loop infinito -->
-            <img src="{% static 'images/code_camp_1.jpg' %}" alt="Slide 1">
-            <img src="{% static 'images/code_camp_4.jpg' %}" alt="Slide 2">
-            <img src="{% static 'images/code_camp_3.jpg' %}" alt="Slide 3">
-            <img src="{% static 'images/capitol_maker.jpg' %}" alt="Slide 4">
-        </div>
-        <button class="carousel-button prev" onclick="prevSlide()">&#10094;</button>
-        <button class="carousel-button next" onclick="nextSlide()">&#10095;</button>
-    </div>
-{% endblock %}
+{% block navbar %}{% endblock %}
 
 {% block extra_styles %}
-    <link rel="stylesheet" href="{% static 'capitol/css/index_styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home_styles.css' %}">
     <style>
-        /* Elimina scroll en la página de inicio */
         body {
             overflow: hidden;
             height: 100vh;
         }
+        
         main {
             height: calc(100vh - 140px);
             overflow: hidden;
@@ -50,12 +28,30 @@
     </style>
 {% endblock %}
 
+{% block content %}
+<div class="carousel">
+    <div class="carousel-images">
+        <img src="{% static 'images/code_camp_1.jpg' %}" alt="Slide 1">
+        <img src="{% static 'images/code_camp_4.jpg' %}" alt="Slide 2">
+        <img src="{% static 'images/code_camp_3.jpg' %}" alt="Slide 3">
+        <img src="{% static 'images/capitol_maker.jpg' %}" alt="Slide 4">
+        <!-- Duplicamos las imágenes para loop infinito -->
+        <img src="{% static 'images/code_camp_1.jpg' %}" alt="Slide 1">
+        <img src="{% static 'images/code_camp_4.jpg' %}" alt="Slide 2">
+        <img src="{% static 'images/code_camp_3.jpg' %}" alt="Slide 3">
+        <img src="{% static 'images/capitol_maker.jpg' %}" alt="Slide 4">
+    </div>
+    <button class="carousel-button prev" onclick="prevSlide()">&#10094;</button>
+    <button class="carousel-button next" onclick="nextSlide()">&#10095;</button>
+</div>
+{% endblock %}
+
 {% block extra_scripts %}
 <script>
     let index = 0;
     const carouselImages = document.querySelector('.carousel-images');
     const slides = document.querySelectorAll('.carousel-images img');
-    const totalSlides = slides.length / 2; // La mitad porque están duplicadas
+    const totalSlides = slides.length / 2;
     let isTransitioning = false;
 
     function moveSlide() {
@@ -68,7 +64,6 @@
         carouselImages.style.transition = 'transform 0.5s ease-in-out';
         carouselImages.style.transform = `translateX(${offset}%)`;
         
-        // Cuando llegamos al final, reseteamos sin transición
         if (index >= totalSlides) {
             setTimeout(() => {
                 carouselImages.style.transition = 'none';
@@ -116,7 +111,6 @@
         }
     }
 
-    // Auto-advance cada 3 segundos
     setInterval(moveSlide, 3000);
 </script>
 {% endblock %}
