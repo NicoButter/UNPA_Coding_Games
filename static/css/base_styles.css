@@ -81,28 +81,39 @@ header {
     display: flex;
     align-items: center;
     gap: 12px;
-    justify-content: flex-end;
+    justify-content: flex-start;
     flex-shrink: 0;
+    background: linear-gradient(90deg, rgba(10, 10, 10, 0.8), rgba(26, 26, 46, 0.8));
+    padding: 0 20px;
 }
 
 .nav-links a {
-    color: #fff;
+    color: #e8e4d9;
     text-decoration: none;
-    font-size: 0.75em;
-    padding: 6px 16px;
+    font-size: 0.9em;
+    padding: 12px 20px;
     border-radius: 6px;
     transition: all 0.3s ease;
     border: 2px solid transparent;
-    background-color: rgba(212, 175, 55, 0.1);
+    background-color: transparent;
     font-weight: 500;
     white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .nav-links a:hover {
+    background-color: rgba(212, 175, 55, 0.2);
+    border-color: #d4af37;
+    color: #d4af37;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.nav-links a.active {
     background-color: rgba(212, 175, 55, 0.3);
     border-color: #d4af37;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+    color: #d4af37;
 }
 
 /* Avatar en header */
